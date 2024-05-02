@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/add_post"
+        android:title="Add Post"
+        android:visible="true"
+        android:orderInCategory="100"/>
+    <item android:id="@+id/signout"
+        android:title="Sign Out"
+        android:visible="true"
+        android:orderInCategory="101"/>
+    <item android:id="@+id/findPharmacies"
+        android:title="Find Pharmacies"
+        android:visible="true"
+        android:orderInCategory="101"/>
+</menu>

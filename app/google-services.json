@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "988381811242",
+    "project_id": "organizemedicine",
+    "storage_bucket": "organizemedicine.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988381811242:android:79b00522164f15c70b2953",
+        "android_client_info": {
+          "package_name": "com.example.organizemedicine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTz4ULy_RZ8H2ItVaHp9KYaKw2i1m7IuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

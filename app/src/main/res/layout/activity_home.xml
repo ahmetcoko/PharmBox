@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
+    android:background="@drawable/gradient_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="139dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/user" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Horizontal LinearLayout for Name and Height -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/usernameTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Name"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:padding="8dp" />
+
+                    <TextView
+                        android:id="@+id/userHeightTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Height"
+                        android:textSize="18sp"
+                        android:gravity="center"
+                        android:padding="8dp" />
+                </LinearLayout>
+
+                <!-- Horizontal LinearLayout for Age and Weight -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- TextView for Age -->
+                    <TextView
+                        android:id="@+id/userAgeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Age"
+                        android:textSize="18sp"
+                        android:gravity="center"
+                        android:padding="8dp" />
+
+                    <!-- TextView for Weight -->
+                    <TextView
+                        android:id="@+id/userWeightTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weight"
+                        android:textSize="18sp"
+                        android:gravity="center"
+                        android:padding="8dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <!-- Include your RecyclerView for medical cards or another layout here -->
+        <!-- ... -->
+
+        <!-- Allergies section -->
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="470dp"
+            android:fillViewport="true"
+            android:background="@drawable/gradient_background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Profile ImageView and Text Details here -->
+                <!-- ... -->
+
+                <!-- Horizontal LinearLayout for Past Medicines -->
+
+                <!-- Horizontal LinearLayout for Favorites -->
+                <LinearLayout
+                    android:id="@+id/pastMedicines"
+                    android:layout_width="350dp"
+                    android:layout_height="133dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="60dp"
+                        android:text="PAST MEDICINES"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/Favorites"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:padding="8dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:text="FAVORITES"
+                        android:textStyle="bold"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="60dp"/>
+                </LinearLayout>
+
+                <!-- Horizontal LinearLayout for Allergies -->
+                <LinearLayout
+                    android:id="@+id/Allergies"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:padding="8dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:text="ALLERGIES"
+                        android:textStyle="bold"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="60dp"/>
+                </LinearLayout>
+
+                <!-- ... More views if needed ... -->
+
+            </LinearLayout>
+        </ScrollView>
+
+        <com.ismaeldivita.chipnavigation.ChipNavigationBar
+            android:id="@+id/bottomMenu"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
+            android:background="@drawable/bottom_background"
+            android:padding="4dp"
+            app:cnb_backgroundColor="@color/blue"
+            app:cnb_iconColor="@color/blue"
+            app:cnb_iconSize="20dp"
+            app:cnb_menuResource="@menu/bottom_menu"
+            app:cnb_radius="50dp"
+            app:cnb_unselectedColor="#ffffff"
+            tools:ignore="MissingConstraints" />
+
+
+    </LinearLayout>
+</ScrollView>
