@@ -13,8 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.organizemedicine.R
+import com.example.organizemedicine.adapter.PharmacyAdapter
 import com.example.organizemedicine.databinding.ActivityPharmaciesBinding
+import com.example.organizemedicine.model.Pharmacy
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -40,6 +43,8 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var sharedPreferences: SharedPreferences
     private var trackBoolean: Boolean? = null
+    private var pharmacyList = ArrayList<Pharmacy>()
+    private lateinit var pharmacyAdapter: PharmacyAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +65,10 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
             fetchDutyPharmacies("İzmir")
         }
         setupBottomNavigation()
+
+        binding.PharmaciesRecyclerView.layoutManager = LinearLayoutManager(this)
+        pharmacyAdapter = PharmacyAdapter(pharmacyList)
+        binding.PharmaciesRecyclerView.adapter = pharmacyAdapter
 
     }
     private fun setupBottomNavigation() {
@@ -191,7 +200,22 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (responseData != null) {
                         Toast.makeText(applicationContext, "Pharmacies fetched successfully!", Toast.LENGTH_LONG).show()
                         addPharmacyMarkers(responseData)  // Call to place markers
+
+                        val jsonObj = JSONObject(responseData)
+                        val pharmaciesArray = jsonObj.getJSONArray("result")
+                        for (i in 0 until pharmaciesArray.length()) {
+                            val pharmacyJson = pharmaciesArray.getJSONObject(i)
+                            val pharmacy = Pharmacy(
+                                name = pharmacyJson.getString("name"),
+                                dist = pharmacyJson.getString("dist"),
+                                address = pharmacyJson.getString("address"),
+                                phone = pharmacyJson.getString("phone"),
+                                loc = pharmacyJson.getString("loc")
+                            )
+                            pharmacyList.add(pharmacy)
+                        }
                     }
+                    pharmacyAdapter.notifyDataSetChanged()
                 }
             }
         })

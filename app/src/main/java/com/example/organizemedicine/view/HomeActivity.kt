@@ -28,7 +28,7 @@ class HomeActivity : AppCompatActivity() {
 
         setupBottomNavigation()
         fetchCurrentUserInformation()
-        fetchLikedPosts()
+        //fetchLikedPosts()
 
         binding.signOutBtn.setOnClickListener() {
             auth.signOut()
@@ -40,7 +40,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        fetchLikedPosts()  // Refresh liked posts when returning to the activity
+       // fetchLikedPosts()  // Refresh liked posts when returning to the activity
     }
 
     private fun setupBottomNavigation() {
@@ -83,7 +83,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchLikedPosts() {
+    /*private fun fetchLikedPosts() {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             firestoreDb.collection("Posts").whereArrayContains("likedBy", user.uid)
@@ -101,7 +101,7 @@ class HomeActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error fetching favorites: ${exception.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
         }
-    }
+    }*/
 
     private fun addPostToFavoriteSection(post: Post) {
         val imageView = ImageView(this)

@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.RecyclerRowBinding
@@ -17,6 +18,7 @@ import com.squareup.picasso.Picasso
 interface OnShareButtonClickListener {
     fun onShareButtonClick(view: View)
 }
+
 
 class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val listener: OnShareButtonClickListener) : RecyclerView.Adapter<FeedRecyclerAdapter.PostHolder>() {
     private val db = Firebase.firestore
@@ -43,24 +45,36 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
 
+            binding.likeImageView.setOnClickListener {
+                likePost(post)
+            }
+
             setupShareButton(post, listener)
         }
 
         private fun setupShareButton(post: Post, listener: OnShareButtonClickListener) {
-            Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
-                override fun onSuccess() {
-                    binding.shareImageView.setOnClickListener {
-                        listener.onShareButtonClick(binding.root) // Pass the root view of the item
+            if (post.downloadUrl.isNullOrEmpty()) {
+                // Handle the case where downloadUrl is null or empty
+                // For example, you can set a default image or hide the ImageView
+                binding.recyclerImageView.setImageResource(R.drawable.no_image)
+            } else {
+                Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
+                    override fun onSuccess() {
+                        binding.shareImageView.setOnClickListener {
+                            listener.onShareButtonClick(binding.root) // Pass the root view of the item
+                        }
+                        binding.likeImageView.setOnClickListener {
+                            likePost(post)
+                        }
                     }
-                    binding.likeImageView.setOnClickListener {
-                        likePost(post)
-                    }
-                }
 
-                override fun onError(e: Exception?) {
-                    // Optionally handle errors, e.g., show a placeholder image or a message
-                }
-            })
+                    override fun onError(e: Exception?) {
+                        // Handle errors, e.g., show a placeholder image or a message
+                        binding.recyclerImageView.setImageResource(R.drawable.no_image)
+                        Toast.makeText(binding.root.context, "Failed to load image", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
         }
 
         private fun likePost(post: Post) {

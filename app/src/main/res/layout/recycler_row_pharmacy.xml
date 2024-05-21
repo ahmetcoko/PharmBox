@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="260dp"
+    android:padding="8dp"
+    android:background="@drawable/gradient_background">
+
+    <TextView
+        android:id="@+id/tvPharmacyName"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnLocation"
+        tools:text="Pharmacy Name" />
+
+    <TextView
+        android:id="@+id/tvPharmacyDistrict"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvPharmacyName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnLocation"
+        tools:text="District" />
+
+    <TextView
+        android:id="@+id/tvPharmacyAddress"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvPharmacyDistrict"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnLocation"
+        tools:text="1234 Pharmacy Address" />
+
+    <TextView
+        android:id="@+id/tvPharmacyPhone"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvPharmacyAddress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnLocation"
+        tools:text="+90 555 123 4567" />
+
+    <ImageButton
+        android:id="@+id/btnLocation"
+        android:layout_width="180dp"
+        android:layout_height="250dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/mapmarker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

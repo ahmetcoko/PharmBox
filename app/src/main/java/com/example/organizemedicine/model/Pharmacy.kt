@@ -5,5 +5,5 @@ data class Pharmacy(
     val dist: String,
     val address: String,
     val phone: String,
-    val loc: String
+    val loc: String,
 )

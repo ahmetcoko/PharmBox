@@ -1,8 +1,10 @@
 package com.example.organizemedicine.view
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -34,10 +36,11 @@ class PostUploadActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPostUploadBinding
     private lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
     private lateinit var permissionLauncher : ActivityResultLauncher<String>
-    var selectedPicture : Uri? = null
+    private var selectedPicture : Uri? = null
     private lateinit var auth : FirebaseAuth
     private lateinit var firestore : FirebaseFirestore
     private lateinit var storage: FirebaseStorage
+    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +54,23 @@ class PostUploadActivity : AppCompatActivity() {
         auth = Firebase.auth
         firestore = Firebase.firestore
         storage = Firebase.storage
+
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                // Use the imageBitmap as needed
+                // For example, you can set it to an ImageView
+                binding.imageView.setImageBitmap(imageBitmap)
+            }
+        }
+
+        binding.cameraBtn.setOnClickListener {
+            openCamera()
+        }
+
+        binding.deleteBtn.setOnClickListener {
+            deletePhoto(view)
+        }
 
         binding.apply {
             bottomMenu.setItemSelected(R.id.bottom_upload)
@@ -68,56 +88,71 @@ class PostUploadActivity : AppCompatActivity() {
                     startActivity(Intent(this@PostUploadActivity,PharmaciesActivity::class.java))
                 }
             }
-
-
-
-
-
-
         }
-
-
-
-
-
     }
 
-    fun upload(view: View){
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(cameraIntent)
+    }
+
+    fun deletePhoto(view: View) {
+        binding.imageView.setImageResource(R.drawable.select_image)
+    }
+
+    fun upload(view: View) {
         val uuid = UUID.randomUUID()
         val imageName = "$uuid.jpg"
         val reference = storage.reference
         val imageReference = reference.child("images").child(imageName)
 
-        if (selectedPicture != null){
-            imageReference.putFile(selectedPicture!!).addOnSuccessListener{ taskSnapshot ->
+        if (selectedPicture != null) {
+            // Upload the selected picture
+            imageReference.putFile(selectedPicture!!).addOnSuccessListener { taskSnapshot ->
                 taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
                     val downloadUrl = uri.toString()
-                    val postMap  = hashMapOf<String, Any>()
-                    if (auth.currentUser != null){
-                        postMap["downloadUrl"] = downloadUrl
-                        postMap["userEmail"] = auth.currentUser!!.email!!
-                        postMap["comment"] = binding.commentText.text.toString()
-                        postMap["date"] = Timestamp.now()
-                        postMap["score"] = binding.ratingBar.rating
-                        postMap["likedBy"] = listOf<String>() // Add this line
-
-                        firestore.collection("Posts").add(postMap).addOnSuccessListener { documentReference ->
-                            val postId = documentReference.id // Get the ID of the newly created document
-                            postMap["postId"] = postId // Add the postId to the postMap
-                            documentReference.update("postId", postId) // Update the document to include the postId
-                            finish()
-                        }.addOnFailureListener {
-                            Log.e("PostUploadActivity", "Failed to add document: ${it.localizedMessage}")
-                        }
-                    }
+                    savePostToFirestore(downloadUrl)
                 }.addOnFailureListener { exception ->
                     Log.e("PostUploadActivity", "Failed to get download URL: ${exception.localizedMessage}")
+                    Toast.makeText(this, "Error getting download URL: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
-            }.addOnFailureListener{
+            }.addOnFailureListener {
                 Log.e("PostUploadActivity", "Failed to upload file: ${it.localizedMessage}")
+                Toast.makeText(this, "Error uploading image: ${it.message}", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            // If no picture is selected, use a null URL for the post
+            savePostToFirestore(null)
         }
     }
+
+    private fun savePostToFirestore(downloadUrl: String?) {
+        val postMap = hashMapOf<String, Any>(
+            "userEmail" to (auth.currentUser?.email ?: ""),
+            "comment" to binding.commentText.text.toString(),
+            "date" to Timestamp.now(),
+            "likedBy" to listOf<String>()
+        )
+
+        // Add download URL only if it is not null
+        downloadUrl?.let {
+            postMap["downloadUrl"] = it
+        }
+
+        firestore.collection("Posts").add(postMap).addOnSuccessListener { documentReference ->
+            val postId = documentReference.id  // Get the ID of the newly created document
+            postMap["postId"] = postId  // Add the postId to the postMap
+            documentReference.update("postId", postId)  // Update the document to include the postId
+            // Navigate to MedicineFeedActivity
+            val intent = Intent(this@PostUploadActivity, MedicineFeedActivity::class.java)
+            startActivity(intent)
+            finish()
+        }.addOnFailureListener { e ->
+            Log.e("PostUploadActivity", "Failed to add document: ${e.localizedMessage}")
+            Toast.makeText(this, "Error saving post: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
 
