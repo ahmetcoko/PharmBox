@@ -1,5 +1,6 @@
 package com.example.organizemedicine.view
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationListener
@@ -58,7 +59,19 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnFetchPharmacies.setOnClickListener {
             fetchDutyPharmacies("İzmir")
         }
+        setupBottomNavigation()
 
+    }
+    private fun setupBottomNavigation() {
+        binding.bottomMenu.setItemSelected(R.id.bottom_Pharmacies)
+        binding.bottomMenu.setOnItemSelectedListener {
+            when (it) {
+                R.id.bottom_upload -> startActivity(Intent(this, PostUploadActivity::class.java))
+                R.id.bottom_search -> startActivity(Intent(this, SearchActivity::class.java))
+                R.id.bottom_home -> startActivity(Intent(this, MedicineFeedActivity::class.java))
+                R.id.bottom_profile -> startActivity(Intent(this, HomeActivity::class.java))
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -151,7 +164,7 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val request = Request.Builder()
             .url(url)
-            .header("authorization", "apikey Enter Your api-key")
+            .header("authorization", "apikey 00MjE7zGQB3LRFcbJHUe3X:6z7xPEB4gwe1z7mZ2oAtV8")
             .header("content-type", "application/json")
             .build()
 

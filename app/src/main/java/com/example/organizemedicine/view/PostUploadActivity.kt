@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -63,6 +64,9 @@ class PostUploadActivity : AppCompatActivity() {
                 else if (it == R.id.bottom_profile){
                     startActivity(Intent(this@PostUploadActivity,HomeActivity::class.java))
                 }
+                else if (it == R.id.bottom_Pharmacies){
+                    startActivity(Intent(this@PostUploadActivity,PharmaciesActivity::class.java))
+                }
             }
 
 
@@ -81,13 +85,11 @@ class PostUploadActivity : AppCompatActivity() {
     fun upload(view: View){
         val uuid = UUID.randomUUID()
         val imageName = "$uuid.jpg"
-        val reference = storage.reference // reference artık bize firebase storage ekranını veriyor
-        val imageReference = reference.child("images").child(imageName) // bir alt reference oluşturdun , bir üstü için parent kullanman lazım içine "images/images.jpg" yazarsan child olarak images klasörü açar içine images.jpg koyar
+        val reference = storage.reference
+        val imageReference = reference.child("images").child(imageName)
 
         if (selectedPicture != null){
-            imageReference.putFile(selectedPicture!!).addOnSuccessListener{
-                    taskSnapshot ->
-                // Task completed successfully
+            imageReference.putFile(selectedPicture!!).addOnSuccessListener{ taskSnapshot ->
                 taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
                     val downloadUrl = uri.toString()
                     val postMap  = hashMapOf<String, Any>()
@@ -96,27 +98,25 @@ class PostUploadActivity : AppCompatActivity() {
                         postMap["userEmail"] = auth.currentUser!!.email!!
                         postMap["comment"] = binding.commentText.text.toString()
                         postMap["date"] = Timestamp.now()
-                        postMap["score"] = binding.ratingBar.rating // Capture the rating from the RatingBar
+                        postMap["score"] = binding.ratingBar.rating
+                        postMap["likedBy"] = listOf<String>() // Add this line
 
-                        firestore.collection("Posts").add(postMap).addOnSuccessListener {
+                        firestore.collection("Posts").add(postMap).addOnSuccessListener { documentReference ->
+                            val postId = documentReference.id // Get the ID of the newly created document
+                            postMap["postId"] = postId // Add the postId to the postMap
+                            documentReference.update("postId", postId) // Update the document to include the postId
                             finish()
                         }.addOnFailureListener {
-                            Toast.makeText(this@PostUploadActivity,it.localizedMessage,Toast.LENGTH_LONG).show()
+                            Log.e("PostUploadActivity", "Failed to add document: ${it.localizedMessage}")
                         }
                     }
-
-
-
                 }.addOnFailureListener { exception ->
-                    Toast.makeText(this, exception.localizedMessage, Toast.LENGTH_LONG).show()
+                    Log.e("PostUploadActivity", "Failed to get download URL: ${exception.localizedMessage}")
                 }
-
-
             }.addOnFailureListener{
-                Toast.makeText(this,it.localizedMessage,Toast.LENGTH_LONG).show()
+                Log.e("PostUploadActivity", "Failed to upload file: ${it.localizedMessage}")
             }
         }
-
     }
 
 

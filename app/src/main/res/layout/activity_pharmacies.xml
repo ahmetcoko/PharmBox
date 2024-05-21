@@ -3,23 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.PharmaciesActivity">
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="500dp" />
+        android:layout_height="433dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp" />
 
     <Button
         android:id="@+id/btnFetchPharmacies"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fetch Pharmacies"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/map"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/map"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="10dp"
+        android:text="Fetch Pharmacies" />
 
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="401dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="500dp" />
+
+    <com.ismaeldivita.chipnavigation.ChipNavigationBar
+        android:id="@+id/bottomMenu"
+        android:layout_width="401dp"
+        android:layout_height="61dp"
+        android:layout_below="@+id/recyclerView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bottom_background"
+        app:cnb_backgroundColor="@color/blue"
+        app:cnb_iconColor="@color/blue"
+        app:cnb_iconSize="20dp"
+        app:cnb_menuResource="@menu/bottom_menu"
+        app:cnb_radius="50dp"
+        app:cnb_unselectedColor="#ffffff" />
 
 </RelativeLayout>
 

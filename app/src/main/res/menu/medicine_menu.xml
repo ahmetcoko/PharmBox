@@ -8,8 +8,4 @@
         android:title="Sign Out"
         android:visible="true"
         android:orderInCategory="101"/>
-    <item android:id="@+id/findPharmacies"
-        android:title="Find Pharmacies"
-        android:visible="true"
-        android:orderInCategory="101"/>
 </menu>

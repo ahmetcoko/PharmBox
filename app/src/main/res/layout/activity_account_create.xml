@@ -31,6 +31,7 @@
         android:layout_marginEnd="8dp"
         android:inputType="textPersonName" />
 
+
     <EditText
         android:id="@+id/lastName"
         android:layout_width="0dp"
@@ -58,7 +59,7 @@
         android:id="@+id/phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Phone number"
+        android:hint="Phone number(10 digits)"
         app:layout_constraintTop_toTopOf="@+id/username"
         app:layout_constraintStart_toEndOf="@+id/username"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,39 +75,40 @@
 
         <EditText
             android:id="@+id/ageEditText"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
+            android:layout_width="113dp"
+            android:layout_height="40dp"
             android:hint="Age"
             android:inputType="number"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/heightEditText"
-            app:layout_constraintHorizontal_weight="1"/>
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/heightEditText"
-            android:layout_width="0dp"
-            android:layout_height="37dp"
-            android:hint="Height"
+            android:layout_width="123dp"
+            android:layout_height="45dp"
+            android:hint="Height(in cm)"
             android:inputType="numberDecimal"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ageEditText"
             app:layout_constraintEnd_toStartOf="@id/weightEditText"
-            app:layout_constraintHorizontal_weight="1"/>
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/ageEditText"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <EditText
             android:id="@+id/weightEditText"
-            android:layout_width="0dp"
-            android:layout_height="39dp"
-            android:hint="Weight"
+            android:layout_width="136dp"
+            android:layout_height="44dp"
+            android:hint="Weight(in kg)"
             android:inputType="numberDecimal"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/heightEditText"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="1"/>
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/heightEditText"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -148,15 +150,15 @@
 
     <Button
         android:id="@+id/createAccountButton"
-        android:layout_width="388dp"
-        android:layout_height="46dp"
+        android:layout_width="328dp"
+        android:layout_height="45dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
         android:onClick="signUpClicked"
         android:text="Create Account"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintHorizontal_bias="0.255"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 

@@ -1,15 +1,9 @@
 package com.example.organizemedicine.view
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.ActivityAccountCreateBinding
-import com.example.organizemedicine.databinding.ActivityMainBinding
 import com.example.organizemedicine.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +21,7 @@ class AccountCreateActivity : AppCompatActivity() {
         binding.createAccountButton.setOnClickListener {
             signUpClicked()
         }
+
     }
 
     private fun signUpClicked() {

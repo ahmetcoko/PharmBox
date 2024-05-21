@@ -22,15 +22,15 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 
-
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private var medicinesList = mutableListOf<String>()
     private var filteredMedicines = mutableListOf<String>()
     private var searchJob: Job? = null
     private var searchHandler = Handler(Looper.getMainLooper())
-    private val debouncePeriod: Long = 300  // Milisaniye cinsinden gecikme süresi
+    private val debouncePeriod: Long = 1  // Milisaniye cinsinden gecikme süresi
     private var medicinesSet = mutableSetOf<String>()
+    private val trie = Trie()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class SearchActivity : AppCompatActivity() {
             val searchText = it.toString().lowercase()
             searchHandler.postDelayed({
                 filterMedicines(searchText)
-            }, debouncePeriod)
+            },debouncePeriod)
         }
 
         binding.apply {
@@ -57,6 +57,8 @@ class SearchActivity : AppCompatActivity() {
                     startActivity(Intent(this@SearchActivity, HomeActivity::class.java))
                 } else if (it == R.id.bottom_home) {
                     startActivity(Intent(this@SearchActivity, MedicineFeedActivity::class.java))
+                }else if (it == R.id.bottom_Pharmacies) {
+                    startActivity(Intent(this@SearchActivity, PharmaciesActivity::class.java))
                 }
             }
         }
@@ -66,20 +68,22 @@ class SearchActivity : AppCompatActivity() {
         val inputStream = assets.open("medicines.csv")
         val reader = BufferedReader(InputStreamReader(inputStream))
         reader.useLines { lines ->
-            lines.forEach { medicinesSet.add(it.trim()) }
+            lines.forEach { trie.insert(it.trim().lowercase()) }
         }
     }
 
     private fun filterMedicines(query: String) {
         searchJob?.cancel()
         searchJob = CoroutineScope(Dispatchers.Default).launch {
-            delay(300)
-            val results = medicinesSet.filter { it.lowercase().contains(query) }
+            delay(300)  // Wait for 300ms before starting the search
+            val results = trie.wordsWithPrefix(query.lowercase())
             withContext(Dispatchers.Main) {
                 updateUI(results)
             }
         }
     }
+
+
 
     private fun updateUI(medicines: List<String>) {
         binding.itemsLayout.removeAllViews()
@@ -89,10 +93,15 @@ class SearchActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.setMargins(8, 8, 8, 8) }
-                text = medicine
+                text = medicine.uppercase()  // Convert the medicine name to uppercase
                 background = ContextCompat.getDrawable(context, R.drawable.fragment_background)
                 setPadding(16, 16, 16, 16)
                 gravity = Gravity.CENTER
+                setOnClickListener {
+                    val intent = Intent(this@SearchActivity, MedicineInfoActivity::class.java)
+                    intent.putExtra("medicine_name", medicine)
+                    startActivity(intent)
+                }
             }
             binding.itemsLayout.addView(textView)
         }

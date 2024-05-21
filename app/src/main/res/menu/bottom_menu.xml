@@ -10,7 +10,14 @@
 
     <item android:id="@+id/bottom_search"
         android:icon="@drawable/search0"
-        android:title="Home"
+        android:title="Search"
+        app:cnb_iconColor="@color/white"
+        app:cnb_backgroundColor="@color/blue"
+        />
+    <item android:id="@+id/bottom_Pharmacies"
+        android:title="Pharmacies"
+        android:visible="true"
+        android:icon="@drawable/pharmacies"
         app:cnb_iconColor="@color/white"
         app:cnb_backgroundColor="@color/blue"
         />

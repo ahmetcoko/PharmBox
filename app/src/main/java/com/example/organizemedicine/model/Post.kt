@@ -1,8 +1,15 @@
 package com.example.organizemedicine.model
 
 data class Post(
-    val email: String,
-    val comment: String,
-    val downloadUrl: String,
-    val score: Float // Assuming scores can have half-points
-)
+    var postId: String,
+    var userEmail: String,
+    var comment: String,
+    var downloadUrl: String,
+    var score: Float,
+    var isLiked: Boolean,
+    var likeCount: Int,
+    var likedBy: List<String>
+) {
+
+    constructor() : this("", "", "", "", 0.0f, false, 0, listOf())
+}
