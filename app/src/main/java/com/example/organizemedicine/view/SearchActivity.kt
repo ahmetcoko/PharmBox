@@ -40,6 +40,8 @@ class SearchActivity : AppCompatActivity() {
         // Load medicines from the CSV file
         loadMedicines()
 
+        filterMedicines("A")
+
         binding.searchText.addTextChangedListener {
             searchHandler.removeCallbacksAndMessages(null)
             val searchText = it.toString().lowercase()

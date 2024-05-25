@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.ActivityMainBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -49,6 +47,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.forgotBTN.setOnClickListener {
+            forgotPasswordClicked(view)
+        }
+
+
+
     }
 
     fun signInClicked(view : View){
@@ -72,4 +76,22 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    fun forgotPasswordClicked(view: View) {
+        val email = binding.emailText.text.toString()
+
+        if (email.isNotEmpty()) {
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Password reset email sent to $email", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Error occurred: ${task.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } else {
+            Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 }
