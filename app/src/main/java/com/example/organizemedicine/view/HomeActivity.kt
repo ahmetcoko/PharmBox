@@ -2,9 +2,11 @@ package com.example.organizemedicine.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.ActivityHomeBinding
@@ -36,6 +38,10 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+        binding.bmiImageView.setOnClickListener {
+            bmiClick(it)
+        }
     }
 
     override fun onResume() {
@@ -64,13 +70,24 @@ class HomeActivity : AppCompatActivity() {
                     if (documentSnapshot.exists()) {
                         val username = documentSnapshot.getString("username") ?: "N/A"
                         val age = documentSnapshot.getLong("age")?.toInt() ?: "N/A"
-                        val height = documentSnapshot.getDouble("height") ?: "N/A"
-                        val weight = documentSnapshot.getDouble("weight") ?: "N/A"
+                        val heightCm = documentSnapshot.getDouble("height") ?: 0.0
+                        val weight = documentSnapshot.getDouble("weight") ?: 0.0
+
+                        // Convert height to meters
+                        val height = heightCm / 100
+
+                        // Calculate BMI
+                        val bmi = if (height != 0.0) {
+                            weight / (height * height)
+                        } else {
+                            0.0
+                        }
 
                         binding.usernameTextView.text = username
                         binding.userAgeTextView.text = age.toString()
-                        binding.userHeightTextView.text = String.format("%.2f", height)
+                        binding.userHeightTextView.text = String.format("%.2f", heightCm)
                         binding.userWeightTextView.text = String.format("%.2f", weight)
+                        binding.bmiTextView.text = String.format("BMI : %.2f", bmi) // Set the calculated BMI
                     } else {
                         Toast.makeText(this, "User does not exist", Toast.LENGTH_SHORT).show()
                     }
@@ -117,4 +134,26 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+
+    fun bmiClick(view: View) {
+        val bmiValueString = binding.bmiTextView.text.toString().split(":")[1].trim()
+        val bmiValue = bmiValueString.replace(",", ".").toDouble()
+
+        val bmiStatus = when {
+            bmiValue < 18.5 -> "Underweight"
+            bmiValue < 24.9 -> "Normal weight"
+            bmiValue < 29.9 -> "Overweight"
+            else -> "Obesity"
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("BMI Information")
+            .setMessage("Your BMI is $bmiValue, which is considered $bmiStatus.")
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        dialog.show()
+    }
 }

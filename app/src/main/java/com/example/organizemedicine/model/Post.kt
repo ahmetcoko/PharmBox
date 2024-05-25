@@ -8,7 +8,8 @@ data class Post(
     var score: Float,
     var isLiked: Boolean,
     var likeCount: Int,
-    var likedBy: List<String>
+    var likedBy: List<String>,
+    val medicineName: String = ""
 ) {
 
     constructor() : this("", "", "", "", 0.0f, false, 0, listOf())

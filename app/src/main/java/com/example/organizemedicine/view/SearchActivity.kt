@@ -28,7 +28,7 @@ class SearchActivity : AppCompatActivity() {
     private var filteredMedicines = mutableListOf<String>()
     private var searchJob: Job? = null
     private var searchHandler = Handler(Looper.getMainLooper())
-    private val debouncePeriod: Long = 1  // Milisaniye cinsinden gecikme süresi
+    private val debouncePeriod: Long = 1
     private var medicinesSet = mutableSetOf<String>()
     private val trie = Trie()
 

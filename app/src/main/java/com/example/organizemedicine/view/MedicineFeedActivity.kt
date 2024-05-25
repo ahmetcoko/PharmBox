@@ -163,8 +163,4 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener {
             }
         }
     }
-
-
-
-
 }

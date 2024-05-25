@@ -1,37 +1,139 @@
 package com.example.organizemedicine.view
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.organizemedicine.R
+import com.example.organizemedicine.adapter.MedicineAdapter
+import com.example.organizemedicine.adapter.OnShareButtonClickListener
 import com.example.organizemedicine.databinding.ActivityMedicineInfoBinding
+import com.example.organizemedicine.model.Post
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.firestore
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
-class MedicineInfoActivity : AppCompatActivity() {
+class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
     private lateinit var binding: ActivityMedicineInfoBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
+    private lateinit var adapter: MedicineAdapter
+    private var postArrayList: ArrayList<Post> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMedicineInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val medicineName = intent.getStringExtra("medicine_name")
-        binding.titleTextView.text = medicineName?.uppercase()
+        val medicineName = intent.getStringExtra("medicine_name") ?: ""
+        binding.titleTextView.text = medicineName.uppercase()
 
-        binding.apply {
-            bottomMenu.setItemSelected(R.id.bottom_search)
-            bottomMenu.setOnItemSelectedListener {
-                if (it == R.id.bottom_upload) {
-                    startActivity(Intent(this@MedicineInfoActivity, PostUploadActivity::class.java))
-                } else if (it == R.id.bottom_profile) {
-                    startActivity(Intent(this@MedicineInfoActivity, HomeActivity::class.java))
-                } else if (it == R.id.bottom_home) {
-                    startActivity(Intent(this@MedicineInfoActivity, MedicineFeedActivity::class.java))
-                }
+        adapter = MedicineAdapter(postArrayList, this)
+
+        auth = Firebase.auth
+        db = Firebase.firestore
+
+        binding.medicineRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.medicineRecyclerView.adapter = adapter
+
+        getData()
+        setupBottomNavigation()
+
+
+    }
+
+
+
+    private fun setupBottomNavigation() {
+        binding.bottomMenu.setItemSelected(R.id.bottom_search)
+        binding.bottomMenu.setOnItemSelectedListener {
+            when (it) {
+                R.id.bottom_upload -> startActivity(Intent(this, PostUploadActivity::class.java))
+                R.id.bottom_profile -> startActivity(Intent(this, HomeActivity::class.java))
+                R.id.bottom_home -> startActivity(Intent(this, MedicineFeedActivity::class.java))
+                R.id.bottom_Pharmacies -> startActivity(Intent(this, PharmaciesActivity::class.java))
             }
         }
+    }
 
 
+    private fun getData(){
+        val medicineName = binding.titleTextView.text.toString()
+        db.collection("Posts")
+            .whereEqualTo("medicineName", medicineName)
+            .orderBy("date", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Toast.makeText(this, error.localizedMessage, Toast.LENGTH_LONG).show()
+                } else {
+                    if (value != null) {
+                        if (!value.isEmpty) {
+                            val documents = value.documents
+                            postArrayList.clear()
+                            for (document in documents) {
+                                val comment = document.getString("comment") ?: ""
+                                val userEmail = document.getString("userEmail") ?: ""
+                                val downloadUrl = document.getString("downloadUrl") ?: ""
+                                val score = document.getDouble("score")?.toFloat() ?: 0.0f
+                                val likedBy = document.get("likedBy") as? List<String> ?: listOf()
+                                val isLiked = likedBy.contains(auth.currentUser?.uid)
+                                val likeCount = likedBy.size
 
+                                val postId = document.id
+                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy)
+                                postArrayList.add(post)
+                            }
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+            }
+    }
 
+    fun sharePost(view: View) {
+        // Ensure the view has been laid out
+        view.post {
+            // Create a bitmap from the view
+            val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            // Save the bitmap to a file
+            try {
+                val file = File(externalCacheDir, "shared_image.png")
+                val fileOutputStream = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                fileOutputStream.flush()
+                fileOutputStream.close()
+
+                val fileUri = FileProvider.getUriForFile(this@MedicineInfoActivity, "$packageName.provider", file)
+
+                // Create the share intent
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_STREAM, fileUri)
+                    type = "image/*"
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share image via"))
+            } catch (e: IOException) {
+                Toast.makeText(this, "Failed to share the image: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onShareButtonClick(view: View) {
+        sharePost(view)
     }
 }

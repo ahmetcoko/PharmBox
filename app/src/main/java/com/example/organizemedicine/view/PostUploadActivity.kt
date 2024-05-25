@@ -7,15 +7,23 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.ActivityPostUploadBinding
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +37,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.util.UUID
 
 class PostUploadActivity : AppCompatActivity() {
@@ -41,6 +57,13 @@ class PostUploadActivity : AppCompatActivity() {
     private lateinit var firestore : FirebaseFirestore
     private lateinit var storage: FirebaseStorage
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private var medicinesList = mutableListOf<String>()
+    private var filteredMedicines = mutableListOf<String>()
+    private var searchJob: Job? = null
+    private var searchHandler = Handler(Looper.getMainLooper())
+    private val debouncePeriod: Long = 1  // Milisaniye cinsinden gecikme süresi
+    private var medicinesSet = mutableSetOf<String>()
+    private val trie = Trie()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +73,8 @@ class PostUploadActivity : AppCompatActivity() {
         val appCheckConfig = SafetyNetAppCheckProviderFactory.getInstance()
         FirebaseAppCheck.getInstance().installAppCheckProviderFactory(appCheckConfig)
         registerLauncher()
+
+        loadMedicines()
 
         auth = Firebase.auth
         firestore = Firebase.firestore
@@ -89,6 +114,16 @@ class PostUploadActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.medicineSearchTxt.addTextChangedListener {
+            searchHandler.removeCallbacksAndMessages(null)
+            val searchText = it.toString().lowercase()
+            searchHandler.postDelayed({
+                filterMedicines(searchText)
+            },debouncePeriod)
+        }
+
+        initSearchFunctionality()
     }
 
     private fun openCamera() {
@@ -96,8 +131,61 @@ class PostUploadActivity : AppCompatActivity() {
         cameraLauncher.launch(cameraIntent)
     }
 
+    private fun loadMedicines() {
+        val inputStream = assets.open("medicines.csv")
+        val reader = BufferedReader(InputStreamReader(inputStream))
+        reader.useLines { lines ->
+            lines.forEach { trie.insert(it.trim().lowercase()) }
+        }
+    }
+
     fun deletePhoto(view: View) {
         binding.imageView.setImageResource(R.drawable.select_image)
+    }
+
+    private fun initSearchFunctionality() {
+        binding.medicineSearchTxt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterMedicines(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
+    }
+
+    private fun filterMedicines(query: String) {
+        searchJob?.cancel()
+        searchJob = CoroutineScope(Dispatchers.Default).launch {
+            delay(300)  // Wait for 300ms before starting the search
+            val results = trie.wordsWithPrefix(query.lowercase())
+            withContext(Dispatchers.Main) {
+                updateUI(results)
+            }
+        }
+    }
+
+    private fun updateUI(medicines: List<String>) {
+        binding.medicinesLayout.removeAllViews()
+        medicines.forEach { medicine ->
+            val textView = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { it.setMargins(8, 8, 8, 8) }
+                text = medicine.uppercase()  // Convert the medicine name to uppercase
+                background = ContextCompat.getDrawable(context, R.drawable.fragment_background)
+                setPadding(16, 16, 16, 16)
+                gravity = Gravity.CENTER
+                setOnClickListener{
+                    binding.pickedMedicineTxt.text = medicine.uppercase()
+                }
+            }
+            binding.medicinesLayout.addView(textView)
+        }
     }
 
     fun upload(view: View) {
@@ -131,7 +219,8 @@ class PostUploadActivity : AppCompatActivity() {
             "userEmail" to (auth.currentUser?.email ?: ""),
             "comment" to binding.commentText.text.toString(),
             "date" to Timestamp.now(),
-            "likedBy" to listOf<String>()
+            "likedBy" to listOf<String>(),
+            "medicineName" to binding.pickedMedicineTxt.text.toString() // Add this line
         )
 
         // Add download URL only if it is not null
