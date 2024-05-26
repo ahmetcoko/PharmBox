@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.SearchActivity"
-    android:background="@drawable/gradient_background">
+    android:background="@drawable/fragment_background">
 
     <!-- EditText for Search -->
     <EditText
@@ -77,13 +77,11 @@
     <!-- Bottom Navigation Bar -->
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomMenu"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="407dp"
+        android:layout_height="64dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
         android:background="@drawable/bottom_background"
-        android:padding="4dp"
         app:cnb_backgroundColor="@color/blue"
         app:cnb_iconColor="@color/blue"
         app:cnb_iconSize="20dp"
@@ -91,7 +89,6 @@
         app:cnb_radius="50dp"
         app:cnb_unselectedColor="#ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

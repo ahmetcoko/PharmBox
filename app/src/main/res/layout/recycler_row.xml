@@ -56,45 +56,48 @@
             android:id="@+id/likeImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/unliked"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="25dp"
             android:onClick="likePost"
-            android:layout_marginRight="16dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/unliked" />
 
         <TextView
             android:id="@+id/likeNum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/likeImageView"
+            android:layout_marginStart="-18dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/likeImageView"
             android:text="20"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_alignBottom="@id/likeImageView"
-            android:layout_alignEnd="@id/likeImageView"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="4dp" />
-
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/commentImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="145dp"
+            android:layout_marginStart="135dp"
             android:layout_toEndOf="@id/likeImageView"
-            android:src="@drawable/comment"
-            android:onClick="onCommentButtonClick"/>
+            android:onClick="onCommentButtonClick"
+            android:scaleType="fitCenter"
+            android:src="@drawable/comment" />
 
         <ImageView
             android:id="@+id/shareImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="129dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="120dp"
             android:layout_toEndOf="@id/commentImageView"
             android:onClick="sharePost"
+            android:scaleType="fitCenter"
             android:src="@drawable/share2" />
 
     </RelativeLayout>
+
+
+
 
 
 </LinearLayout>

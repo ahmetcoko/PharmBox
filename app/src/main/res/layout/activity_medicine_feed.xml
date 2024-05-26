@@ -10,7 +10,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feedRecyclerView"
         android:layout_width="0dp"
-        android:layout_height="650dp"
+        android:layout_height="720dp"
         app:layout_constraintBottom_toTopOf="@+id/medicineFeedLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
