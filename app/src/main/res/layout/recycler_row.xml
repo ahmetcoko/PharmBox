@@ -81,7 +81,8 @@
             android:layout_height="24dp"
             android:layout_marginStart="145dp"
             android:layout_toEndOf="@id/likeImageView"
-            android:src="@drawable/comment"/>
+            android:src="@drawable/comment"
+            android:onClick="onCommentButtonClick"/>
 
         <ImageView
             android:id="@+id/shareImageView"

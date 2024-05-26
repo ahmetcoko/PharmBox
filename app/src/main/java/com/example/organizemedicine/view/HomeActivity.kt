@@ -1,24 +1,41 @@
 package com.example.organizemedicine.view
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.organizemedicine.R
+import com.example.organizemedicine.adapter.CommentAdapter
+import com.example.organizemedicine.adapter.HomeRecyclerAdapter
+import com.example.organizemedicine.adapter.OnShareButtonClickListener
 import com.example.organizemedicine.databinding.ActivityHomeBinding
+import com.example.organizemedicine.model.Comment
 import com.example.organizemedicine.model.Post
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
+import com.google.firebase.firestore.Query
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentButtonClickListener {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+    private lateinit var postArrayList: ArrayList<Post>
+    private lateinit var homeAdapter: HomeRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +44,15 @@ class HomeActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestoreDb = FirebaseFirestore.getInstance()
+
+        postArrayList = ArrayList()
+        binding.homeRecyclerView.layoutManager = LinearLayoutManager(this)
+        homeAdapter = HomeRecyclerAdapter(postArrayList, this, this)
+        binding.homeRecyclerView.adapter = homeAdapter
+
+        // Method to fetch posts
+
+        getData()
 
         setupBottomNavigation()
         fetchCurrentUserInformation()
@@ -60,6 +86,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun fetchCurrentUserInformation() {
         val currentUser = auth.currentUser
@@ -100,39 +127,6 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    /*private fun fetchLikedPosts() {
-        val currentUser = auth.currentUser
-        currentUser?.let { user ->
-            firestoreDb.collection("Posts").whereArrayContains("likedBy", user.uid)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    binding.favoritesContainer.removeAllViews() // Clear previous views
-                    for (document in querySnapshot.documents) {
-                        val post = document.toObject(Post::class.java)
-                        post?.let {
-                            addPostToFavoriteSection(it)
-                        }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Toast.makeText(this, "Error fetching favorites: ${exception.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }*/
-
-    private fun addPostToFavoriteSection(post: Post) {
-        val imageView = ImageView(this)
-        imageView.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ).apply {
-            marginStart = 8.dpToPx()
-            marginEnd = 8.dpToPx()
-        }
-        Picasso.get().load(post.downloadUrl).into(imageView)
-        binding.favoritesContainer.addView(imageView)
-    }
-
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
     fun bmiClick(view: View) {
@@ -155,5 +149,135 @@ class HomeActivity : AppCompatActivity() {
             .create()
 
         dialog.show()
+    }
+
+    override fun onCommentButtonClick(view: View) {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.comment_dailog_layout)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.setCancelable(true)
+
+        val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
+        recyclerViewComments.layoutManager = LinearLayoutManager(this)
+
+        // Retrieve comments associated with the post
+        val postId = view.tag.toString()  // Make sure to set the post ID as the tag of the button/view
+        firestoreDb.collection("Posts").document(postId)
+            .get()
+            .addOnSuccessListener { document ->
+                val commentsList = ArrayList<Comment>()
+                val comments = document.get("comments")
+                if (comments != null) {
+                    val commentsData = comments as List<Map<String, Any>>
+                    for (comment in commentsData) {
+                        val content = comment["content"] as String
+                        val username = comment["username"] as String
+                        commentsList.add(Comment(username, content))
+                    }
+                }
+                recyclerViewComments.adapter = CommentAdapter(commentsList)
+            }
+
+        val btnAddComment = dialog.findViewById<Button>(R.id.btnAddComment)
+        val editTextComment = dialog.findViewById<EditText>(R.id.editTextComment)
+
+        btnAddComment.setOnClickListener {
+            val comment = editTextComment.text.toString()
+            if (comment.isNotBlank()) {
+                // Retrieve the username from Firestore
+                firestoreDb.collection("Users").document(auth.currentUser?.uid!!)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val username = document.getString("username")
+                        if (username != null) {
+                            // Add the comment to Firestore
+                            val newComment = hashMapOf(
+                                "username" to username,
+                                "content" to comment
+                            )
+                            firestoreDb.collection("Posts").document(postId)
+                                .update("comments", FieldValue.arrayUnion(newComment))
+                            dialog.dismiss()
+                        } else {
+                            // Handle the case where the username is null
+                            Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        // Handle the error
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+        dialog.show()
+    }
+
+
+    override fun onShareButtonClick(view: View) {
+        sharePost(view)
+    }
+
+    private fun getData(){
+        val currentUserId = auth.currentUser?.uid
+        firestoreDb.collection("Posts").orderBy("date", Query.Direction.DESCENDING).addSnapshotListener { value, error ->
+            if (error != null) {
+                Toast.makeText(this, error.localizedMessage, Toast.LENGTH_LONG).show()
+            } else {
+                if (value != null) {
+                    if (!value.isEmpty) {
+                        val documents = value.documents
+                        postArrayList.clear()
+                        for (document in documents) {
+                            val likedBy = document.get("likedBy") as? List<String> ?: listOf()
+                            if (likedBy.contains(currentUserId)) {
+                                val comment = document.getString("comment") ?: ""
+                                val userEmail = document.getString("userEmail") ?: ""
+                                val downloadUrl = document.getString("downloadUrl") ?: ""
+                                val score = document.getDouble("score")?.toFloat() ?: 0.0f
+                                val isLiked = likedBy.contains(currentUserId)
+                                val likeCount = likedBy.size
+
+                                val postId = document.id
+                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy)
+                                postArrayList.add(post)
+                            }
+                        }
+                        homeAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+    }
+
+    fun sharePost(view: View) {
+        // Ensure the view has been laid out
+        view.post {
+            // Create a bitmap from the view
+            val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            // Save the bitmap to a file
+            try {
+                val file = File(externalCacheDir, "shared_image.png")
+                val fileOutputStream = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                fileOutputStream.flush()
+                fileOutputStream.close()
+
+                val fileUri = FileProvider.getUriForFile(this@HomeActivity, "$packageName.provider", file)
+
+                // Create the share intent
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_STREAM, fileUri)
+                    type = "image/*"
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share image via"))
+            } catch (e: IOException) {
+                Toast.makeText(this, "Failed to share the image: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

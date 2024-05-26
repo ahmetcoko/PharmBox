@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.organizemedicine.R
 import com.example.organizemedicine.databinding.RecyclerRowBinding
 import com.example.organizemedicine.model.Post
+import com.example.organizemedicine.view.OnCommentButtonClickListener
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
@@ -20,7 +21,7 @@ interface OnShareButtonClickListener {
 }
 
 
-class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val listener: OnShareButtonClickListener) : RecyclerView.Adapter<FeedRecyclerAdapter.PostHolder>() {
+class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val listener: OnShareButtonClickListener,private val commentListener: OnCommentButtonClickListener) : RecyclerView.Adapter<FeedRecyclerAdapter.PostHolder>() {
     private val db = Firebase.firestore
     private val auth = Firebase.auth
 
@@ -31,7 +32,10 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
     override fun onBindViewHolder(holder: PostHolder, position: Int) {
         val post = postList[position]
-        holder.bind(post, listener)
+        holder.bind(post, listener, commentListener)
+
+
+
     }
 
     override fun getItemCount(): Int {
@@ -39,14 +43,21 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
     }
 
     class PostHolder(private val binding: RecyclerRowBinding, private val adapter: FeedRecyclerAdapter) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: Post, listener: OnShareButtonClickListener) {
+        fun bind(post: Post, listener: OnShareButtonClickListener, commentListener: OnCommentButtonClickListener) {
             binding.recyclerEmailText.text = post.userEmail
             binding.recyclerCommentText.text = post.comment
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
 
+            binding.commentImageView.tag = post.postId
+
             binding.likeImageView.setOnClickListener {
                 likePost(post)
+            }
+
+            binding.commentImageView.setOnClickListener {
+                Log.d("FeedRecyclerAdapter", "Comment button clicked for post ID: ${it.tag}") // Add this log statement
+                commentListener.onCommentButtonClick(it)
             }
 
             setupShareButton(post, listener)

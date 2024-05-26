@@ -1,22 +1,30 @@
 package com.example.organizemedicine.view
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.organizemedicine.R
+import com.example.organizemedicine.adapter.CommentAdapter
 import com.example.organizemedicine.adapter.MedicineAdapter
 import com.example.organizemedicine.adapter.OnShareButtonClickListener
 import com.example.organizemedicine.databinding.ActivityMedicineInfoBinding
+import com.example.organizemedicine.model.Comment
 import com.example.organizemedicine.model.Post
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
@@ -39,7 +47,7 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         val medicineName = intent.getStringExtra("medicine_name") ?: ""
         binding.titleTextView.text = medicineName.uppercase()
 
-        adapter = MedicineAdapter(postArrayList, this)
+        adapter = MedicineAdapter(postArrayList, this, this)
 
         auth = Firebase.auth
         db = Firebase.firestore
@@ -51,6 +59,64 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         setupBottomNavigation()
 
 
+
+
+
+    }
+
+
+    fun onCommentButtonClick(view: View) {
+        // Copy the same code from the onCommentButtonClick method in MedicineFeedActivity
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.comment_dailog_layout)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.setCancelable(true)
+
+        val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
+        recyclerViewComments.layoutManager = LinearLayoutManager(this)
+
+        val postId = view.tag.toString()
+        db.collection("Posts").document(postId)
+            .get()
+            .addOnSuccessListener { document ->
+                val commentsList = ArrayList<Comment>()
+                val comments = document.get("comments") as List<Map<String, Any>>
+                for (comment in comments) {
+                    val content = comment["content"] as String
+                    val username = comment["username"] as String
+                    commentsList.add(Comment(username, content))
+                }
+                recyclerViewComments.adapter = CommentAdapter(commentsList)
+            }
+
+        val btnAddComment = dialog.findViewById<Button>(R.id.btnAddComment)
+        val editTextComment = dialog.findViewById<EditText>(R.id.editTextComment)
+
+        btnAddComment.setOnClickListener {
+            val comment = editTextComment.text.toString()
+            if (comment.isNotBlank()) {
+                db.collection("Users").document(auth.currentUser?.uid!!)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val username = document.getString("username")
+                        if (username != null) {
+                            val newComment = hashMapOf(
+                                "username" to username,
+                                "content" to comment
+                            )
+                            db.collection("Posts").document(postId)
+                                .update("comments", FieldValue.arrayUnion(newComment))
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+        dialog.show()
     }
 
 
