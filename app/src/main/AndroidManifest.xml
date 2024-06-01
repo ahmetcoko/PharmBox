@@ -15,7 +15,7 @@
         android:label="PharmBox"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.GreenButtons"
         tools:targetApi="31">
         <activity
             android:name=".view.MedicineInfoActivity"

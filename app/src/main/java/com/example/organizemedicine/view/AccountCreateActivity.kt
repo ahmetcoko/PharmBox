@@ -2,6 +2,7 @@ package com.example.organizemedicine.view
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.organizemedicine.databinding.ActivityAccountCreateBinding
 import com.example.organizemedicine.model.User
@@ -22,9 +23,30 @@ class AccountCreateActivity : AppCompatActivity() {
             signUpClicked()
         }
 
+        binding.privacyPolicyText.setOnClickListener{
+            showPrivacyPolicyDialog()
+        }
+
     }
 
+    private fun showPrivacyPolicyDialog() {
+        AlertDialog.Builder(this)
+            .setMessage("By registering for our application, you acknowledge that not all reviews of medications shared on this platform are accurate or reliable. Users of this application should exercise discretion and consult healthcare professionals for accurate medical advice and information. The opinions and experiences shared by users are subjective and may not reflect the efficacy or safety of medications for all individuals. The platform does not endorse or verify the accuracy of user-generated content. By proceeding, you agree to use this application at your own risk and accept responsibility for your interactions and decisions based on the information provided herein.")
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+
     private fun signUpClicked() {
+
+        if (!binding.privacySwitch.isChecked) {
+            Toast.makeText(this, "You should give permission that you accept privacy policy", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
         val firstName = binding.firstName.text.toString().trim()
         val lastName = binding.lastName.text.toString().trim()
         val username = binding.username.text.toString().trim()

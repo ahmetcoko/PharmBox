@@ -20,6 +20,7 @@ import com.example.organizemedicine.adapter.MedicineAdapter
 import com.example.organizemedicine.adapter.OnShareButtonClickListener
 import com.example.organizemedicine.databinding.ActivityMedicineInfoBinding
 import com.example.organizemedicine.model.Comment
+import com.example.organizemedicine.model.MedicineDetails
 import com.example.organizemedicine.model.Post
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -46,6 +47,12 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
 
         val medicineName = intent.getStringExtra("medicine_name") ?: ""
         binding.titleTextView.text = medicineName.uppercase()
+
+        val medicine = MedicineDetails().medicineDetails[medicineName]
+
+        binding.activeIngredientsTextView.text = medicine?.activeIngredients
+        binding.excipientsTextView.text = medicine?.excipients
+        binding.doNotUseWithTextView.text = medicine?.doNotUseWith
 
         adapter = MedicineAdapter(postArrayList, this, this)
 

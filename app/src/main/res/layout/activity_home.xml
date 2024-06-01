@@ -21,11 +21,13 @@
             android:gravity="center">
 
             <!-- Profile image and Sign Out button section -->
+
+            <!-- Additional user information section -->
+
             <LinearLayout
-                android:layout_width="130dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="5dp"
+                android:layout_width="135dp"
+                android:layout_height="130dp"
+
                 android:layout_marginEnd="16dp"
                 android:orientation="vertical">
 
@@ -37,13 +39,12 @@
 
                 <Button
                     android:id="@+id/sign_outBtn"
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="Sign Out" />
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rounded_button"
+                    android:text="Sıgn Out" />
             </LinearLayout>
 
-            <!-- Additional user information section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

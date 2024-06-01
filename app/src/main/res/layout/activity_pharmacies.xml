@@ -22,7 +22,8 @@
         android:layout_below="@+id/map"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:text="Find Pharmacies" />
+        android:text="Fınd Pharmacıes"
+        android:background="@drawable/rounded_button"/>
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -7,52 +7,101 @@
     tools:context=".view.MedicineInfoActivity"
     android:background="@drawable/fragment_background">
 
-
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
-        android:layout_height="61dp"
+        android:layout_height="43dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
+        android:gravity="center_vertical"
         android:textColor="@color/title_color"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         tools:text="Medicine Name" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/medicineRecyclerView"
-        android:layout_width="410dp"
-        android:layout_height="594dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="70dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_width="match_parent"
+        android:layout_height="339dp"
+        android:layout_below="@+id/titleTextView"
+        android:layout_marginBottom="1dp" />
 
+    <!-- Small title TextView for Active Ingredients -->
+    <TextView
+        android:id="@+id/activeIngredientsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/medicineRecyclerView"
+        android:text="Active Ingredients"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/title_color"/>
+
+    <TextView
+        android:id="@+id/activeIngredientsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activeIngredientsTitle"
+        android:background="@drawable/fragment_background"
+        android:padding="4dp"
+        android:textSize="13sp"
+        tools:text="Active Ingredients: None" />
+
+    <!-- Small title TextView for Excipients -->
+    <TextView
+        android:id="@+id/excipientsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activeIngredientsTextView"
+        android:text="Excipients"
+        android:textColor="@color/title_color"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/excipientsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="86dp"
+        android:layout_below="@id/excipientsTitle"
+        android:layout_marginTop="-3dp"
+        android:background="@drawable/fragment_background"
+        android:padding="4dp"
+        android:textSize="13sp"
+        tools:text="Excipients: None" />
+
+    <!-- Small title TextView for Do Not Use With -->
+    <TextView
+        android:id="@+id/doNotUseWithTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/excipientsTextView"
+        android:text="Do Not Use With"
+        android:textColor="@color/title_color"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/doNotUseWithTextView"
+        android:layout_width="match_parent"
+        android:layout_height="182dp"
+        android:layout_below="@id/doNotUseWithTitle"
+        android:background="@drawable/fragment_background"
+        android:padding="4dp"
+        android:textSize="13sp"
+        tools:text="Do Not Use With: None" />
 
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomMenu"
-        android:layout_width="410dp"
+        android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:layout_marginTop="730dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="-4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_alignParentBottom="true"
         android:background="@drawable/bottom_background"
         app:cnb_backgroundColor="@color/blue"
         app:cnb_iconColor="@color/blue"
         app:cnb_iconSize="20dp"
         app:cnb_menuResource="@menu/bottom_menu"
         app:cnb_radius="50dp"
-        app:cnb_unselectedColor="#ffffff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:cnb_unselectedColor="#ffffff" />
 
 </RelativeLayout>
+
