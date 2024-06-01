@@ -52,7 +52,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="ENTER YOUR api-key" />
+            android:value="AIzaSyAZwRXSuk6lIKhBRTq2uZhBEgOXB15irOQ" />
 
         <activity
             android:name=".view.PharmaciesActivity"

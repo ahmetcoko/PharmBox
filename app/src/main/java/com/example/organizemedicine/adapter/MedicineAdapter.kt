@@ -59,6 +59,9 @@ class MedicineAdapter(private val postList: ArrayList<Post>, private val listene
             }
             setupShareButton(post, listener)
         }
+        init {
+            binding.dots.visibility = View.GONE
+        }
 
         private fun setupShareButton(post: Post, listener: OnShareButtonClickListener) {
             if (post.downloadUrl.isNullOrEmpty()) {

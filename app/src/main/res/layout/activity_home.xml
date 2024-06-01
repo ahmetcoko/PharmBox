@@ -50,6 +50,7 @@
                 android:orientation="vertical">
 
                 <!-- Horizontal layout for BMI Value -->
+                <!-- Horizontal layout for BMI Value and Edit Icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -58,12 +59,12 @@
 
                     <TextView
                         android:id="@+id/bmiTextView"
-                        android:layout_width="158dp"
+                        android:layout_width="98dp"
                         android:layout_height="40dp"
                         android:gravity="center"
                         android:text="BMI Value"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/bmiImageView"
@@ -71,30 +72,46 @@
                         android:layout_height="40dp"
                         android:src="@drawable/bmi"
                         android:onClick="bmiClick"/>
+
+                    <!-- New Edit ImageView for BMI -->
+                    <ImageView
+                        android:id="@+id/editImage"
+                        android:layout_width="23dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:onClick="editBmiClick"
+                        android:src="@drawable/edit" />
                 </LinearLayout>
 
+
+                <!-- User's name and height -->
                 <!-- User's name and height -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:id="@+id/userInformationLayout">
 
                     <TextView
                         android:id="@+id/usernameTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:inputType="text"
+                        android:enabled="false"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="Name"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/userHeightTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:inputType="numberDecimal"
+                        android:enabled="false"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="Height"
@@ -112,21 +129,26 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:inputType="number"
+                        android:enabled="false"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="Age"
                         android:textSize="18sp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/userWeightTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:inputType="numberDecimal"
+                        android:enabled="false"
                         android:gravity="center"
                         android:padding="8dp"
                         android:text="Weight"
                         android:textSize="18sp" />
                 </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

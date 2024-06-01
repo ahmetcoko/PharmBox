@@ -20,14 +20,21 @@
 
         <TextView
             android:id="@+id/recyclerEmailText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="username"
             android:textSize="16sp"
             android:layout_marginStart="10dp"
             android:textColor="@color/black"/>
 
+        <ImageView
+            android:id="@+id/dots"
+            android:layout_width="52dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/dots2" />
     </LinearLayout>
+
 
     <TextView
         android:id="@+id/recyclerCommentText"

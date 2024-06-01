@@ -173,7 +173,7 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val request = Request.Builder()
             .url(url)
-            .header("authorization", "apikey 00MjE7zGQB3LRFcbJHUe3X:6z7xPEB4gwe1z7mZ2oAtV8")
+            .header("authorization", "apikey 6PywqhLrzOHF9YTJmw1mm8:0Upw1P7IfaEdp8jdQC7PGe")
             .header("content-type", "application/json")
             .build()
 
@@ -223,4 +223,6 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 }
+
+
 

@@ -27,6 +27,13 @@
             android:layout_marginStart="10dp"
             android:textColor="@color/black"/>
 
+        <ImageView
+            android:id="@+id/dots"
+            android:layout_width="31dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="100dp"
+            android:src="@drawable/dots" />
+
     </LinearLayout>
 
     <TextView

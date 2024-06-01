@@ -163,9 +163,10 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
                             val likedBy = document.get("likedBy") as? List<String> ?: listOf()
                             val isLiked = likedBy.contains(auth.currentUser?.uid)
                             val likeCount = likedBy.size
+                            val medicineName = document.getString("medicineName") ?: "" // Retrieve the medicineName from Firestore
 
                             val postId = document.id // Get the document ID and use it as the postId
-                            val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy) // Add likedBy here
+                            val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy, medicineName) // Add medicineName here
                             postArrayList.add(post)
                         }
                         feedAdapter.notifyDataSetChanged()
@@ -193,15 +194,10 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
             R.id.signout -> {
                 auth.signOut()
                 val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
-                finish()
                 return true
             }
-            /*R.id.findPharmacies -> {  // New case for Find Pharmacies
-                val intent = Intent(this, PharmaciesActivity::class.java)
-                startActivity(intent)
-                return true
-            }*/
         }
         return super.onOptionsItemSelected(item)
     }
@@ -238,3 +234,4 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
         }
     }
 }
+

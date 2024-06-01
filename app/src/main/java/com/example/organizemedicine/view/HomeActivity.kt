@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -61,6 +62,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         binding.signOutBtn.setOnClickListener() {
             auth.signOut()
             val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
         }
@@ -68,11 +70,15 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         binding.bmiImageView.setOnClickListener {
             bmiClick(it)
         }
+
+        binding.editImage.setOnClickListener {
+            toggleEditSaveMode()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-       // fetchLikedPosts()  // Refresh liked posts when returning to the activity
+        // fetchLikedPosts()  // Refresh liked posts when returning to the activity
     }
 
     private fun setupBottomNavigation() {
@@ -87,7 +93,6 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         }
     }
 
-
     private fun fetchCurrentUserInformation() {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
@@ -100,21 +105,19 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                         val heightCm = documentSnapshot.getDouble("height") ?: 0.0
                         val weight = documentSnapshot.getDouble("weight") ?: 0.0
 
-                        // Convert height to meters
-                        val height = heightCm / 100
+                        binding.usernameTextView.setText(username)
+                        binding.userAgeTextView.setText(age.toString())
+                        binding.userHeightTextView.setText(String.format("%.2f", heightCm))
+                        binding.userWeightTextView.setText(String.format("%.2f", weight))
 
-                        // Calculate BMI
-                        val bmi = if (height != 0.0) {
-                            weight / (height * height)
+                        // Calculate and display the BMI value
+                        if (heightCm > 0) {
+                            val heightM = heightCm / 100
+                            val bmi = weight / (heightM * heightM)
+                            binding.bmiTextView.text = String.format("BMI Value %.2f", bmi)
                         } else {
-                            0.0
+                            binding.bmiTextView.text = "BMI Value: N/A"
                         }
-
-                        binding.usernameTextView.text = username
-                        binding.userAgeTextView.text = age.toString()
-                        binding.userHeightTextView.text = String.format("%.2f", heightCm)
-                        binding.userWeightTextView.text = String.format("%.2f", weight)
-                        binding.bmiTextView.text = String.format("BMI : %.2f", bmi) // Set the calculated BMI
                     } else {
                         Toast.makeText(this, "User does not exist", Toast.LENGTH_SHORT).show()
                     }
@@ -122,10 +125,81 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                 .addOnFailureListener { exception ->
                     Toast.makeText(this, exception.localizedMessage, Toast.LENGTH_SHORT).show()
                 }
-        } ?: run {
-            Toast.makeText(this, "Not authenticated", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun toggleEditSaveMode() {
+        val isEditing = binding.editImage.tag?.equals("edit") ?: true
+
+        if (isEditing) {
+            binding.editImage.setImageResource(R.drawable.saveimage)
+            binding.editImage.tag = "save"
+            enableEditing(true)
+        } else {
+            binding.editImage.setImageResource(R.drawable.edit)
+            binding.editImage.tag = "edit"
+            enableEditing(false)
+            saveUserData()
+        }
+    }
+
+
+    private fun enableEditing(enable: Boolean) {
+        binding.usernameTextView.isEnabled = enable
+        binding.userAgeTextView.isEnabled = enable
+        binding.userHeightTextView.isEnabled = enable
+        binding.userWeightTextView.isEnabled = enable
+    }
+
+
+
+
+    private fun saveUserData() {
+        val user = auth.currentUser
+        user?.let {
+            val username = binding.usernameTextView.text.toString()
+            val age = binding.userAgeTextView.text.toString().toIntOrNull()
+            val height = binding.userHeightTextView.text.toString().replace(',', '.').toDoubleOrNull()
+            val weight = binding.userWeightTextView.text.toString().replace(',', '.').toDoubleOrNull()
+
+            val userData = hashMapOf<String, Any>()
+            if (username.isNotBlank()) userData["username"] = username
+            if (age != null) userData["age"] = age
+            if (height != null) userData["height"] = height
+            if (weight != null) userData["weight"] = weight
+
+            firestoreDb.collection("Users").document(user.uid).set(userData, SetOptions.merge())
+                .addOnSuccessListener {
+                    Toast.makeText(this, "User's data updated successfully.", Toast.LENGTH_SHORT).show()
+                    updateBMI(height, weight)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to update data: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+
+
+
+
+    private fun updateBMI(height: Double?, weight: Double?) {
+        if (height != null && weight != null && height > 0) {
+            val heightM = height / 100
+            val bmi = weight / (heightM * heightM)
+            binding.bmiTextView.text = String.format("BMI Value: %.2f", bmi)
+        } else {
+            binding.bmiTextView.text = "BMI Value: N/A"
+        }
+    }
+
+
+
+
+
+
+
+
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
@@ -236,9 +310,10 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                                 val score = document.getDouble("score")?.toFloat() ?: 0.0f
                                 val isLiked = likedBy.contains(currentUserId)
                                 val likeCount = likedBy.size
+                                val medicineName = document.getString("medicineName") ?: "" // Retrieve the medicineName from Firestore
 
                                 val postId = document.id
-                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy)
+                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy , medicineName)
                                 postArrayList.add(post)
                             }
                         }
