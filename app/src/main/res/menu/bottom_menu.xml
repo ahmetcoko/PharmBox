@@ -9,15 +9,8 @@
         />
 
     <item android:id="@+id/bottom_search"
-        android:icon="@drawable/search0"
+        android:icon="@drawable/search4"
         android:title="Search"
-        app:cnb_iconColor="@color/white"
-        app:cnb_backgroundColor="@color/green2"
-        />
-    <item android:id="@+id/bottom_Pharmacies"
-        android:title="Pharmacies"
-        android:visible="true"
-        android:icon="@drawable/pharmacies"
         app:cnb_iconColor="@color/white"
         app:cnb_backgroundColor="@color/green2"
         />
@@ -28,6 +21,15 @@
         app:cnb_iconColor="@color/white"
         app:cnb_backgroundColor="@color/green2"
         />
+
+    <item android:id="@+id/bottom_Pharmacies"
+        android:title="Pharmacies"
+        android:visible="true"
+        android:icon="@drawable/pharmacy"
+        app:cnb_iconColor="@color/white"
+        app:cnb_backgroundColor="@color/green2"
+        />
+
     <item android:id="@+id/bottom_profile"
         android:icon="@drawable/user"
         android:title="Profile"
