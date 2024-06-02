@@ -17,13 +17,12 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // Find the ImageView
         val logoImageView = findViewById<ImageView>(R.id.roundedImageView)
 
-        // Load the animation
+
         val rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate)
 
-        // Start the animation
+
         logoImageView.startAnimation(rotateAnimation)
 
         Handler(Looper.getMainLooper()).postDelayed({
