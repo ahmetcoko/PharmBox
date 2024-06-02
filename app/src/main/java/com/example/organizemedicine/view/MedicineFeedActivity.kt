@@ -126,6 +126,18 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
                             )
                             db.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
+
+                            // Increment the commentsCount of the post
+                            db.collection("Posts").document(postId).get().addOnSuccessListener { document ->
+                                if (document != null) {
+                                    val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                                    val updatedCommentsCount = commentsCount + 1
+
+                                    // Update the post in the Posts collection in Firestore
+                                    db.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
+                                }
+                            }
+
                             dialog.dismiss()
                         } else {
                             // Handle the case where the username is null
@@ -166,7 +178,13 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
                             val medicineName = document.getString("medicineName") ?: "" // Retrieve the medicineName from Firestore
 
                             val postId = document.id // Get the document ID and use it as the postId
-                            val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy, medicineName) // Add medicineName here
+
+                            // Retrieve the commentsCount, username, and fullname from Firestore
+                            val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                            val username = document.getString("username") ?: ""
+                            val fullname = document.getString("fullName") ?: ""
+
+                            val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy, medicineName, commentsCount, username, fullname)
                             postArrayList.add(post)
                         }
                         feedAdapter.notifyDataSetChanged()

@@ -44,10 +44,12 @@ class MedicineAdapter(private val postList: ArrayList<Post>, private val listene
             post: Post, listener: OnShareButtonClickListener,
             commentListener: MedicineInfoActivity
         ) {
-            binding.recyclerEmailText.text = post.userEmail
+            binding.recyclerEmailText.text ="@" + post.username
             binding.recyclerCommentText.text = post.comment
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
+            binding.commentNum.text = post.commentsCount.toString()
+            binding.fullnameTextView.text = post.fullname
 
             binding.likeImageView.setOnClickListener {
                 likePost(post)

@@ -215,32 +215,48 @@ class PostUploadActivity : AppCompatActivity() {
     }
 
     private fun savePostToFirestore(downloadUrl: String?) {
-        val postMap = hashMapOf<String, Any>(
-            "userEmail" to (auth.currentUser?.email ?: ""),
-            "comment" to binding.commentText.text.toString(),
-            "date" to Timestamp.now(),
-            "likedBy" to listOf<String>(),
-            "medicineName" to binding.pickedMedicineTxt.text.toString() // Add this line
-        )
 
-        // Add download URL only if it is not null
-        downloadUrl?.let {
-            postMap["downloadUrl"] = it
-        }
+        firestore.collection("Users").document(auth.currentUser?.uid!!).get().addOnSuccessListener { document ->
+            val name = document.getString("firstName")
+            val surname = document.getString("lastName")
+            val userName = document.getString("username")
+            val fullName = "$name $surname"
 
-        firestore.collection("Posts").add(postMap).addOnSuccessListener { documentReference ->
-            val postId = documentReference.id  // Get the ID of the newly created document
-            postMap["postId"] = postId  // Add the postId to the postMap
-            documentReference.update("postId", postId)  // Update the document to include the postId
-            // Navigate to MedicineFeedActivity
-            val intent = Intent(this@PostUploadActivity, MedicineFeedActivity::class.java)
-            startActivity(intent)
-            finish()
+            val postMap = hashMapOf(
+                "userEmail" to (auth.currentUser?.email ?: "No Email"),
+                "username" to userName,
+                "fullName" to fullName,
+                "comment" to binding.commentText.text.toString(),
+                "date" to Timestamp.now(),
+                "likedBy" to listOf<String>(),
+                "medicineName" to binding.pickedMedicineTxt.text.toString(),
+                "commentsCount" to 0,
+            )
+
+            downloadUrl?.let {
+                postMap["downloadUrl"] = it
+            }
+
+            firestore.collection("Posts").add(postMap).addOnSuccessListener { documentReference ->
+                val postId = documentReference.id
+                documentReference.update("postId", postId)
+                navigateToMedicineFeedActivity()
+            }.addOnFailureListener { e ->
+                Log.e("PostUploadActivity", "Failed to add document: ${e.localizedMessage}")
+                Toast.makeText(this, "Error saving post: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }.addOnFailureListener { e ->
-            Log.e("PostUploadActivity", "Failed to add document: ${e.localizedMessage}")
-            Toast.makeText(this, "Error saving post: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("PostUploadActivity", "Failed to retrieve user: ${e.localizedMessage}")
+            Toast.makeText(this, "Error retrieving user: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun navigateToMedicineFeedActivity() {
+        val intent = Intent(this@PostUploadActivity, MedicineFeedActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 
 
 

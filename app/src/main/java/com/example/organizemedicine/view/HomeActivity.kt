@@ -271,6 +271,18 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                             )
                             firestoreDb.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
+
+                            // Increment the commentsCount of the post
+                            firestoreDb.collection("Posts").document(postId).get().addOnSuccessListener { document ->
+                                if (document != null) {
+                                    val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                                    val updatedCommentsCount = commentsCount + 1
+
+                                    // Update the post in the Posts collection in Firestore
+                                    firestoreDb.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
+                                }
+                            }
+
                             dialog.dismiss()
                         } else {
                             // Handle the case where the username is null
@@ -291,29 +303,33 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         sharePost(view)
     }
 
-    private fun getData(){
-        val currentUserId = auth.currentUser?.uid
-        firestoreDb.collection("Posts").orderBy("date", Query.Direction.DESCENDING).addSnapshotListener { value, error ->
-            if (error != null) {
-                Toast.makeText(this, error.localizedMessage, Toast.LENGTH_LONG).show()
-            } else {
-                if (value != null) {
-                    if (!value.isEmpty) {
+    private fun getData() {
+        val currentUserEmail = auth.currentUser?.email // Get the current user's email
+        firestoreDb.collection("Posts")
+            .orderBy("date", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Toast.makeText(this, error.localizedMessage, Toast.LENGTH_LONG).show()
+                } else {
+                    if (value != null && !value.isEmpty) {
                         val documents = value.documents
                         postArrayList.clear()
                         for (document in documents) {
-                            val likedBy = document.get("likedBy") as? List<String> ?: listOf()
-                            if (likedBy.contains(currentUserId)) {
+                            val userEmail = document.getString("userEmail") ?: ""
+                            if (userEmail == currentUserEmail) { // Check if the post was created by the current user
+                                val postId = document.id
                                 val comment = document.getString("comment") ?: ""
-                                val userEmail = document.getString("userEmail") ?: ""
                                 val downloadUrl = document.getString("downloadUrl") ?: ""
                                 val score = document.getDouble("score")?.toFloat() ?: 0.0f
-                                val isLiked = likedBy.contains(currentUserId)
+                                val likedBy = document.get("likedBy") as? List<String> ?: listOf()
+                                val isLiked = likedBy.contains(currentUserEmail)
                                 val likeCount = likedBy.size
-                                val medicineName = document.getString("medicineName") ?: "" // Retrieve the medicineName from Firestore
+                                val medicineName = document.getString("medicineName") ?: ""
+                                val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                                val username = document.getString("username") ?: ""
+                                val fullname = document.getString("fullName") ?: ""
 
-                                val postId = document.id
-                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy , medicineName)
+                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy, medicineName, commentsCount, username, fullname)
                                 postArrayList.add(post)
                             }
                         }
@@ -321,8 +337,8 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                     }
                 }
             }
-        }
     }
+
 
     fun sharePost(view: View) {
         // Ensure the view has been laid out

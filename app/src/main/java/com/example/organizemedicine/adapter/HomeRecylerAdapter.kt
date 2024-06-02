@@ -52,10 +52,15 @@ class HomeRecyclerAdapter(
     class PostHolder(private val binding: RecyclerRowBinding, private val adapter: HomeRecyclerAdapter,private val postArrayList: ArrayList<Post>,private val firestoreDb: FirebaseFirestore = Firebase.firestore) : RecyclerView.ViewHolder(binding.root) {
         private val auth = Firebase.auth
         fun bind(post: Post, shareListener: HomeActivity, commentListener: HomeActivity) {
-            binding.recyclerEmailText.text = post.userEmail
+            binding.recyclerEmailText.text ="@" + post.username
             binding.recyclerCommentText.text = post.comment
-            binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
+            binding.commentNum.text = post.commentsCount.toString()
+            binding.fullnameTextView.text = post.fullname
+
+            post.isLiked = post.likedBy.contains(auth.currentUser?.uid)
+            binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
+
 
             binding.commentImageView.tag = post.postId
 
@@ -78,6 +83,7 @@ class HomeRecyclerAdapter(
                 showPopupMenu(view)
             }
         }
+
 
         private fun showPopupMenu(view: View) {
             val popupMenu = PopupMenu(view.context, view)
@@ -171,5 +177,6 @@ class HomeRecyclerAdapter(
                 Log.e("HomeRecyclerAdapter", "Error updating likes", e)
             }
         }
+
     }
 }

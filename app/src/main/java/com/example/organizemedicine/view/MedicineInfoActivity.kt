@@ -73,7 +73,6 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
 
 
     fun onCommentButtonClick(view: View) {
-        // Copy the same code from the onCommentButtonClick method in MedicineFeedActivity
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.comment_dailog_layout)
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -82,16 +81,20 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
         recyclerViewComments.layoutManager = LinearLayoutManager(this)
 
-        val postId = view.tag.toString()
+        // Retrieve comments associated with the post
+        val postId = view.tag.toString()  // Make sure to set the post ID as the tag of the button/view
         db.collection("Posts").document(postId)
             .get()
             .addOnSuccessListener { document ->
                 val commentsList = ArrayList<Comment>()
-                val comments = document.get("comments") as List<Map<String, Any>>
-                for (comment in comments) {
-                    val content = comment["content"] as String
-                    val username = comment["username"] as String
-                    commentsList.add(Comment(username, content))
+                val comments = document.get("comments")
+                if (comments != null) {
+                    val commentsData = comments as List<Map<String, Any>>
+                    for (comment in commentsData) {
+                        val content = comment["content"] as String
+                        val username = comment["username"] as String
+                        commentsList.add(Comment(username, content))
+                    }
                 }
                 recyclerViewComments.adapter = CommentAdapter(commentsList)
             }
@@ -102,23 +105,39 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         btnAddComment.setOnClickListener {
             val comment = editTextComment.text.toString()
             if (comment.isNotBlank()) {
+                // Retrieve the username from Firestore
                 db.collection("Users").document(auth.currentUser?.uid!!)
                     .get()
                     .addOnSuccessListener { document ->
                         val username = document.getString("username")
                         if (username != null) {
+                            // Add the comment to Firestore
                             val newComment = hashMapOf(
                                 "username" to username,
                                 "content" to comment
                             )
                             db.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
+
+                            // Increment the commentsCount of the post
+                            db.collection("Posts").document(postId).get().addOnSuccessListener { document ->
+                                if (document != null) {
+                                    val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                                    val updatedCommentsCount = commentsCount + 1
+
+                                    // Update the post in the Posts collection in Firestore
+                                    db.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
+                                }
+                            }
+
                             dialog.dismiss()
                         } else {
+                            // Handle the case where the username is null
                             Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { e ->
+                        // Handle the error
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
@@ -164,7 +183,11 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
                                 val likeCount = likedBy.size
 
                                 val postId = document.id
-                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy)
+                                val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
+                                val username = document.getString("username") ?: ""
+                                val fullname = document.getString("fullName") ?: ""
+
+                                val post = Post(postId, userEmail, comment, downloadUrl, score, isLiked, likeCount, likedBy, medicineName, commentsCount, username, fullname)
                                 postArrayList.add(post)
                             }
                             adapter.notifyDataSetChanged()

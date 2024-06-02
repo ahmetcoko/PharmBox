@@ -60,14 +60,18 @@ class AccountCreateActivity : AppCompatActivity() {
 
         // Validation
         when {
-            firstName.isEmpty() -> Toast.makeText(this, "Please enter your first name.", Toast.LENGTH_SHORT).show()
-            lastName.isEmpty() -> Toast.makeText(this, "Please enter your last name.", Toast.LENGTH_SHORT).show()
-            username.isEmpty() -> Toast.makeText(this, "Please enter a username.", Toast.LENGTH_SHORT).show()
-            phone.isEmpty() -> Toast.makeText(this, "Please enter your phone number.", Toast.LENGTH_SHORT).show()
-            email.isEmpty() -> Toast.makeText(this, "Please enter an email address.", Toast.LENGTH_SHORT).show()
-            password.isEmpty() -> Toast.makeText(this, "Please enter a password.", Toast.LENGTH_SHORT).show()
+            firstName.isEmpty() || firstName.length > 20 -> Toast.makeText(this, "Please enter your first name (max 20 characters).", Toast.LENGTH_SHORT).show()
+            lastName.isEmpty() || lastName.length > 20 -> Toast.makeText(this, "Please enter your last name (max 20 characters).", Toast.LENGTH_SHORT).show()
+            username.isEmpty() || username.length > 20 -> Toast.makeText(this, "Please enter a username (max 20 characters).", Toast.LENGTH_SHORT).show()
+            phone.isEmpty() || phone.length !in 11..13 || !phone.all { it.isDigit() } -> Toast.makeText(this, "Please enter your phone number (11-13 digits).", Toast.LENGTH_SHORT).show()
+            email.isEmpty() || !email.contains("@") -> Toast.makeText(this, "Please enter a valid email address.", Toast.LENGTH_SHORT).show()
+            password.isEmpty() || password.length < 6 -> Toast.makeText(this, "Please enter a password (at least 6 characters).", Toast.LENGTH_SHORT).show()
             confirmPassword.isEmpty() -> Toast.makeText(this, "Please confirm your password.", Toast.LENGTH_SHORT).show()
             password != confirmPassword -> Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+            age == null || age !in 0..120 -> Toast.makeText(this, "Please enter a valid age (0-120).", Toast.LENGTH_SHORT).show()
+            height == null || height !in 0.0..250.0 -> Toast.makeText(this, "Please enter a valid height (0-250).", Toast.LENGTH_SHORT).show()
+            weight == null || weight !in 0.0..350.0 -> Toast.makeText(this, "Please enter a valid weight (0-350).", Toast.LENGTH_SHORT).show()
+
             else -> {
                 // Create the account
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->

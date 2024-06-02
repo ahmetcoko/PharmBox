@@ -49,12 +49,16 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
     class PostHolder(private val binding: RecyclerRowBinding, private val adapter: FeedRecyclerAdapter,private val firestoreDb: FirebaseFirestore = Firebase.firestore, private val postArrayList: ArrayList<Post>) : RecyclerView.ViewHolder(binding.root) {
         private val auth = Firebase.auth
         fun bind(post: Post, listener: OnShareButtonClickListener, commentListener: OnCommentButtonClickListener) {
-            binding.recyclerEmailText.text = post.userEmail
+            binding.recyclerEmailText.text ="@" + post.username
             binding.recyclerCommentText.text = post.comment
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
+            binding.commentNum.text = post.commentsCount.toString()
+            binding.fullnameTextView.text = post.fullname
 
             binding.commentImageView.tag = post.postId
+
+
 
             binding.likeImageView.setOnClickListener {
                 likePost(post)
