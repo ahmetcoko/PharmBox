@@ -26,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
         logoImageView.startAnimation(rotateAnimation)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, MedicineFeedActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }, splashTimeout)
     }

@@ -49,7 +49,7 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
     class PostHolder(private val binding: RecyclerRowBinding, private val adapter: FeedRecyclerAdapter,private val firestoreDb: FirebaseFirestore = Firebase.firestore, private val postArrayList: ArrayList<Post>) : RecyclerView.ViewHolder(binding.root) {
         private val auth = Firebase.auth
         fun bind(post: Post, listener: OnShareButtonClickListener, commentListener: OnCommentButtonClickListener) {
-            binding.recyclerEmailText.text ="@" + post.username
+            binding.recyclerEmailText.text = "@" + post.username
             binding.recyclerCommentText.text = post.comment
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
@@ -58,7 +58,22 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
             binding.commentImageView.tag = post.postId
 
+            // Set up image every time bind is called
+            if (post.downloadUrl.isNullOrEmpty()) {
+                binding.recyclerImageView.visibility = View.GONE
+            } else {
+                binding.recyclerImageView.visibility = View.VISIBLE
+                Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
+                    override fun onSuccess() {
+                        // Image loaded successfully
+                    }
 
+                    override fun onError(e: Exception?) {
+                        binding.recyclerImageView.setImageResource(R.drawable.no_image)
+                        Toast.makeText(binding.root.context, "Failed to load image", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
 
             binding.likeImageView.setOnClickListener {
                 likePost(post)
@@ -68,11 +83,11 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
                 commentListener.onCommentButtonClick(it)
             }
 
-
-
-
-            setupShareButton(post, listener)
+            binding.shareImageView.setOnClickListener {
+                listener.onShareButtonClick(binding.root)
+            }
         }
+
 
         init {
             binding.dots.setOnClickListener { view ->
@@ -161,22 +176,26 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
                 if (likedBy.contains(adapter.auth.currentUser?.uid)) {
                     likedBy = likedBy - adapter.auth.currentUser!!.uid!!
-
                 } else {
                     likedBy = likedBy + adapter.auth.currentUser!!.uid!!
                 }
 
                 transaction.update(postRef, "likedBy", likedBy)
 
-                post.isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
-                post.likeCount = likedBy.size
-
+                // Find the post in the postList and update it
+                val index = postArrayList.indexOfFirst { it.postId == post.postId }
+                if (index != -1) {
+                    postArrayList[index].isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
+                    postArrayList[index].likeCount = likedBy.size
+                }
 
                 null
             }.addOnSuccessListener {
-
-                binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
-                binding.likeNum.text = post.likeCount.toString()
+                // Notify the adapter that the item has changed
+                val index = postArrayList.indexOfFirst { it.postId == post.postId }
+                if (index != -1) {
+                    adapter.notifyItemChanged(index)
+                }
             }.addOnFailureListener { e ->
                 Log.e("FeedRecyclerAdapter", "Error updating likes", e)
             }
