@@ -114,7 +114,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                         if (heightCm > 0) {
                             val heightM = heightCm / 100
                             val bmi = weight / (heightM * heightM)
-                            binding.bmiTextView.text = String.format("BMI Value %.2f", bmi)
+                            binding.bmiTextView.text = String.format("BMI Value: %.2f", bmi)
                         } else {
                             binding.bmiTextView.text = "BMI Value: N/A"
                         }
@@ -204,7 +204,12 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
     fun bmiClick(view: View) {
-        val bmiValueString = binding.bmiTextView.text.toString().split(":")[1].trim()
+        val splitText = binding.bmiTextView.text.toString().split(":")
+        if (splitText.size < 2) {
+            Toast.makeText(this, "BMI value is not available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val bmiValueString = splitText[1].trim()
         val bmiValue = bmiValueString.replace(",", ".").toDouble()
 
         val bmiStatus = when {
