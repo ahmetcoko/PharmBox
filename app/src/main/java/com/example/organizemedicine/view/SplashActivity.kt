@@ -9,7 +9,7 @@ import com.example.organizemedicine.R
 
 class SplashActivity : AppCompatActivity() {
 
-    private val splashTimeout: Long = 3000 // 3 seconds
+    private val splashTimeout: Long = 3000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

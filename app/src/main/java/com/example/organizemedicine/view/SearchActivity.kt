@@ -37,10 +37,10 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Load medicines from the CSV file
+
         loadMedicines()
 
-        //filterMedicines("A")
+
 
         loadDefaultMedicines()
 
@@ -146,7 +146,7 @@ class SearchActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.setMargins(8, 8, 8, 8) }
-                text = medicine.uppercase()  // Convert the medicine name to uppercase
+                text = medicine.uppercase()
                 background = ContextCompat.getDrawable(context, R.drawable.fragment_background)
                 setPadding(16, 16, 16, 16)
                 gravity = Gravity.CENTER

@@ -69,7 +69,6 @@ class HomeRecyclerAdapter(
             }
 
             binding.commentImageView.setOnClickListener {
-                Log.d("HomeRecyclerAdapter", "Comment button clicked for post ID: ${it.tag}")
                 commentListener.onCommentButtonClick(it)
             }
 
@@ -90,17 +89,16 @@ class HomeRecyclerAdapter(
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
 
             popupMenu.setOnMenuItemClickListener { menuItem ->
-                val position = bindingAdapterPosition // Get the position of the clicked item in the RecyclerView
+                val position = bindingAdapterPosition
                 if (position == RecyclerView.NO_POSITION) {
-                    return@setOnMenuItemClickListener false // Safely return if the position is not valid
+                    return@setOnMenuItemClickListener false
                 }
 
                 when (menuItem.itemId) {
                     R.id.go_to_medicine_details -> {
-                        val post = postArrayList[position] // Retrieve the post from the ArrayList
-                        val medicineName = post.medicineName // Assuming each post has a 'medicineName' field
+                        val post = postArrayList[position]
+                        val medicineName = post.medicineName
                         if (medicineName != null) {
-                            Log.d("FeedAdapter", "Navigating to details with medicine name: $medicineName")
                             val intent = Intent(view.context, MedicineInfoActivity::class.java)
                             intent.putExtra("medicine_name", medicineName)
                             view.context.startActivity(intent)

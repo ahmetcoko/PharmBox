@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        //güncel kullanıcı girişi
+
         val currentUser = auth.currentUser
         if (currentUser != null){
             val intent = Intent(this@MainActivity, MedicineFeedActivity::class.java)

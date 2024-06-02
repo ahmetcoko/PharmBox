@@ -51,13 +51,13 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         homeAdapter = HomeRecyclerAdapter(postArrayList, this, this)
         binding.homeRecyclerView.adapter = homeAdapter
 
-        // Method to fetch posts
+
 
         getData()
 
         setupBottomNavigation()
         fetchCurrentUserInformation()
-        //fetchLikedPosts()
+
 
         binding.signOutBtn.setOnClickListener() {
             auth.signOut()
@@ -78,7 +78,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
 
     override fun onResume() {
         super.onResume()
-        // fetchLikedPosts()  // Refresh liked posts when returning to the activity
+
     }
 
     private fun setupBottomNavigation() {
@@ -234,8 +234,8 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
         recyclerViewComments.layoutManager = LinearLayoutManager(this)
 
-        // Retrieve comments associated with the post
-        val postId = view.tag.toString()  // Make sure to set the post ID as the tag of the button/view
+
+        val postId = view.tag.toString()
         firestoreDb.collection("Posts").document(postId)
             .get()
             .addOnSuccessListener { document ->
@@ -304,7 +304,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
     }
 
     private fun getData() {
-        val currentUserEmail = auth.currentUser?.email // Get the current user's email
+        val currentUserEmail = auth.currentUser?.email
         firestoreDb.collection("Posts")
             .orderBy("date", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
@@ -316,7 +316,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                         postArrayList.clear()
                         for (document in documents) {
                             val userEmail = document.getString("userEmail") ?: ""
-                            if (userEmail == currentUserEmail) { // Check if the post was created by the current user
+                            if (userEmail == currentUserEmail) {
                                 val postId = document.id
                                 val comment = document.getString("comment") ?: ""
                                 val downloadUrl = document.getString("downloadUrl") ?: ""
@@ -341,14 +341,14 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
 
 
     fun sharePost(view: View) {
-        // Ensure the view has been laid out
+
         view.post {
-            // Create a bitmap from the view
+
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
 
-            // Save the bitmap to a file
+
             try {
                 val file = File(externalCacheDir, "shared_image.png")
                 val fileOutputStream = FileOutputStream(file)

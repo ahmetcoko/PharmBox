@@ -47,9 +47,9 @@ class PharmacyAdapter (private val pharmacyList: ArrayList<Pharmacy>) : Recycler
         }
 
         private fun openMaps(context: Context, loc: String) {
-            val locParts = loc.split(",") // Split the loc string into latitude and longitude
-            val lat = locParts[0].toDouble() // Convert latitude to Double
-            val lng = locParts[1].toDouble() // Convert longitude to Double
+            val locParts = loc.split(",")
+            val lat = locParts[0].toDouble()
+            val lng = locParts[1].toDouble()
 
             val gmmIntentUri = Uri.parse("geo:$lat,$lng?q=$lat,$lng")
             val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)

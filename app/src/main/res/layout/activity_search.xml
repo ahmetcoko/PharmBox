@@ -8,7 +8,7 @@
     tools:context=".view.SearchActivity"
     android:background="@drawable/fragment_background">
 
-    <!-- EditText for Search -->
+
     <EditText
         android:id="@+id/searchText"
         android:layout_width="0dp"
@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- ScrollView for displaying items, constrained between the search bar and bottom navigation -->
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -41,7 +41,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Example TextViews -->
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
@@ -69,12 +69,12 @@
                 android:gravity="center"
                 android:text="NAPROCYN" />
 
-            <!-- Additional TextViews can be added here -->
+
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
+
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomMenu"
         android:layout_width="407dp"

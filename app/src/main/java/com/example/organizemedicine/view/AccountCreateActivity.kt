@@ -15,7 +15,7 @@ class AccountCreateActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = FirebaseAuth.getInstance() // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
         binding = ActivityAccountCreateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -76,25 +76,23 @@ class AccountCreateActivity : AppCompatActivity() {
                 // Create the account
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        // Authentication succeeded
                         val firebaseUser = auth.currentUser
                         val userId = firebaseUser?.uid
 
-                        // Create a User object with details from input fields
+
                         val user = User(
                             firstName = firstName,
                             lastName = lastName,
                             username = username,
                             phoneNumber = phone,
                             email = email,
-                            age = age,             // New property
-                            height = height,       // New property
-                            weight = weight,       // New property
+                            age = age,
+                            height = height,
+                            weight = weight,
 
                         )
 
-                        // Store in Firestore
+
                         userId?.let {
                             FirebaseFirestore.getInstance().collection("Users")
                                 .document(it)
@@ -105,7 +103,7 @@ class AccountCreateActivity : AppCompatActivity() {
                                         "User details saved successfully",
                                         Toast.LENGTH_LONG
                                     ).show()
-                                    // Navigate to another activity or perform other actions
+
                                 }
                                 .addOnFailureListener { e ->
                                     Toast.makeText(
@@ -117,8 +115,6 @@ class AccountCreateActivity : AppCompatActivity() {
                         }
 
                         Toast.makeText(this, "Account created successfully for $username", Toast.LENGTH_LONG).show()
-                        // You may want to add more user information in Firebase Database
-                        // Redirect to sign-in or other activity
                     } else {
                             Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }

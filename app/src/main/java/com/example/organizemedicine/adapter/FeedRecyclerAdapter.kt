@@ -65,7 +65,6 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
             }
 
             binding.commentImageView.setOnClickListener {
-                Log.d("FeedRecyclerAdapter", "Comment button clicked for post ID: ${it.tag}") // Add this log statement
                 commentListener.onCommentButtonClick(it)
             }
 
@@ -86,17 +85,16 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
 
             popupMenu.setOnMenuItemClickListener { menuItem ->
-                val position = bindingAdapterPosition // Get the position of the clicked item in the RecyclerView
+                val position = bindingAdapterPosition
                 if (position == RecyclerView.NO_POSITION) {
-                    return@setOnMenuItemClickListener false // Safely return if the position is not valid
+                    return@setOnMenuItemClickListener false
                 }
 
                 when (menuItem.itemId) {
                     R.id.go_to_medicine_details -> {
-                        val post = postArrayList[position] // Retrieve the post from the ArrayList
-                        val medicineName = post.medicineName // Assuming each post has a 'medicineName' field
+                        val post = postArrayList[position]
+                        val medicineName = post.medicineName
                         if (medicineName != null) {
-                            Log.d("FeedAdapter", "Navigating to details with medicine name: $medicineName")
                             val intent = Intent(view.context, MedicineInfoActivity::class.java)
                             intent.putExtra("medicine_name", medicineName)
                             view.context.startActivity(intent)
@@ -134,14 +132,12 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
         private fun setupShareButton(post: Post, listener: OnShareButtonClickListener) {
             if (post.downloadUrl.isNullOrEmpty()) {
-                // Handle the case where downloadUrl is null or empty
-                // For example, you can set a default image or hide the ImageView
                 binding.recyclerImageView.visibility = View.GONE
             } else {
                 Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {
                         binding.shareImageView.setOnClickListener {
-                            listener.onShareButtonClick(binding.root) // Pass the root view of the item
+                            listener.onShareButtonClick(binding.root)
                         }
                         binding.likeImageView.setOnClickListener {
                             likePost(post)
@@ -171,14 +167,14 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
                 }
 
                 transaction.update(postRef, "likedBy", likedBy)
-                // Update the post object
+
                 post.isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
                 post.likeCount = likedBy.size
 
-                // No need to return anything
+
                 null
             }.addOnSuccessListener {
-                // Update the UI
+
                 binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
                 binding.likeNum.text = post.likeCount.toString()
             }.addOnFailureListener { e ->

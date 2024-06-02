@@ -53,7 +53,7 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
         registerLauncher()
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -122,17 +122,17 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
 
         for (i in 0 until pharmaciesArray.length()) {
             val pharmacy = pharmaciesArray.getJSONObject(i)
-            val locString = pharmacy.getString("loc") // "loc" is in format "lat,lng"
+            val locString = pharmacy.getString("loc")
             val parts = locString.split(",")
-            val lat = parts[0].toDouble() // Convert latitude to Double
-            val lng = parts[1].toDouble() // Convert longitude to Double
-            val pharmacyName = pharmacy.getString("name") // Pharmacy name
-            val address = pharmacy.getString("address") // Pharmacy address
+            val lat = parts[0].toDouble()
+            val lng = parts[1].toDouble()
+            val pharmacyName = pharmacy.getString("name")
+            val address = pharmacy.getString("address")
             runOnUiThread {
                 val markerOptions = MarkerOptions()
                     .position(LatLng(lat, lng))
                     .title(pharmacyName)
-                    .snippet(address) // You can add the address as a snippet
+                    .snippet(address)
                 mMap.addMarker(markerOptions)
             }
         }
@@ -162,7 +162,7 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    // Updated fetchDutyPharmacies method
+
     private fun fetchDutyPharmacies(city: String, district: String? = null) {
         val client = OkHttpClient()
 

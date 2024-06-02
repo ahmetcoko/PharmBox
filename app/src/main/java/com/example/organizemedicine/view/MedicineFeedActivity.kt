@@ -89,8 +89,8 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
         val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
         recyclerViewComments.layoutManager = LinearLayoutManager(this)
 
-        // Retrieve comments associated with the post
-        val postId = view.tag.toString()  // Make sure to set the post ID as the tag of the button/view
+
+        val postId = view.tag.toString()
         db.collection("Posts").document(postId)
             .get()
             .addOnSuccessListener { document ->
@@ -113,13 +113,11 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
         btnAddComment.setOnClickListener {
             val comment = editTextComment.text.toString()
             if (comment.isNotBlank()) {
-                // Retrieve the username from Firestore
                 db.collection("Users").document(auth.currentUser?.uid!!)
                     .get()
                     .addOnSuccessListener { document ->
                         val username = document.getString("username")
                         if (username != null) {
-                            // Add the comment to Firestore
                             val newComment = hashMapOf(
                                 "username" to username,
                                 "content" to comment
@@ -127,25 +125,24 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
                             db.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
 
-                            // Increment the commentsCount of the post
                             db.collection("Posts").document(postId).get().addOnSuccessListener { document ->
                                 if (document != null) {
                                     val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
                                     val updatedCommentsCount = commentsCount + 1
 
-                                    // Update the post in the Posts collection in Firestore
+
                                     db.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
                                 }
                             }
 
                             dialog.dismiss()
                         } else {
-                            // Handle the case where the username is null
+
                             Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { e ->
-                        // Handle the error
+
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
@@ -171,15 +168,15 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
                             val comment = document.getString("comment") ?: ""
                             val userEmail = document.getString("userEmail") ?: ""
                             val downloadUrl = document.getString("downloadUrl") ?: ""
-                            val score = document.getDouble("score")?.toFloat() ?: 0.0f  // Assuming score is stored as a Double in Firestore
+                            val score = document.getDouble("score")?.toFloat() ?: 0.0f
                             val likedBy = document.get("likedBy") as? List<String> ?: listOf()
                             val isLiked = likedBy.contains(auth.currentUser?.uid)
                             val likeCount = likedBy.size
-                            val medicineName = document.getString("medicineName") ?: "" // Retrieve the medicineName from Firestore
+                            val medicineName = document.getString("medicineName") ?: ""
 
-                            val postId = document.id // Get the document ID and use it as the postId
+                            val postId = document.id
 
-                            // Retrieve the commentsCount, username, and fullname from Firestore
+
                             val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
                             val username = document.getString("username") ?: ""
                             val fullname = document.getString("fullName") ?: ""
@@ -221,14 +218,14 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
     }
 
     fun sharePost(view: View) {
-        // Ensure the view has been laid out
+
         view.post {
-            // Create a bitmap from the view
+
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
 
-            // Save the bitmap to a file
+
             try {
                 val file = File(externalCacheDir, "shared_image.png")
                 val fileOutputStream = FileOutputStream(file)
@@ -238,7 +235,7 @@ class MedicineFeedActivity : AppCompatActivity(), OnShareButtonClickListener ,On
 
                 val fileUri = FileProvider.getUriForFile(this@MedicineFeedActivity, "$packageName.provider", file)
 
-                // Create the share intent
+
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_STREAM, fileUri)

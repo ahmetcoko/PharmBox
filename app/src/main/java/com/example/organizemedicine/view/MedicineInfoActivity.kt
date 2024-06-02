@@ -81,8 +81,8 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         val recyclerViewComments = dialog.findViewById<RecyclerView>(R.id.recyclerViewComments)
         recyclerViewComments.layoutManager = LinearLayoutManager(this)
 
-        // Retrieve comments associated with the post
-        val postId = view.tag.toString()  // Make sure to set the post ID as the tag of the button/view
+
+        val postId = view.tag.toString()
         db.collection("Posts").document(postId)
             .get()
             .addOnSuccessListener { document ->
@@ -105,7 +105,7 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
         btnAddComment.setOnClickListener {
             val comment = editTextComment.text.toString()
             if (comment.isNotBlank()) {
-                // Retrieve the username from Firestore
+
                 db.collection("Users").document(auth.currentUser?.uid!!)
                     .get()
                     .addOnSuccessListener { document ->
@@ -119,25 +119,25 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
                             db.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
 
-                            // Increment the commentsCount of the post
+
                             db.collection("Posts").document(postId).get().addOnSuccessListener { document ->
                                 if (document != null) {
                                     val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
                                     val updatedCommentsCount = commentsCount + 1
 
-                                    // Update the post in the Posts collection in Firestore
+
                                     db.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
                                 }
                             }
 
                             dialog.dismiss()
                         } else {
-                            // Handle the case where the username is null
+
                             Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { e ->
-                        // Handle the error
+
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
@@ -198,14 +198,14 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
     }
 
     fun sharePost(view: View) {
-        // Ensure the view has been laid out
+
         view.post {
-            // Create a bitmap from the view
+
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
 
-            // Save the bitmap to a file
+
             try {
                 val file = File(externalCacheDir, "shared_image.png")
                 val fileOutputStream = FileOutputStream(file)
@@ -215,7 +215,7 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
 
                 val fileUri = FileProvider.getUriForFile(this@MedicineInfoActivity, "$packageName.provider", file)
 
-                // Create the share intent
+
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_STREAM, fileUri)

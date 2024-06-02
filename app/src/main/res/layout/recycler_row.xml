@@ -27,7 +27,7 @@
                 android:layout_height="40dp"
                 android:src="@drawable/user" />
 
-            <!-- Vertical LinearLayout for email and fullname text views -->
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

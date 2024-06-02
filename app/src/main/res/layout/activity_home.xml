@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/fragment_background">
 
-    <!-- Top LinearLayout -->
+
     <LinearLayout
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
@@ -20,9 +20,6 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <!-- Profile image and Sign Out button section -->
-
-            <!-- Additional user information section -->
 
             <LinearLayout
                 android:layout_width="135dp"
@@ -50,8 +47,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Horizontal layout for BMI Value -->
-                <!-- Horizontal layout for BMI Value and Edit Icon -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -85,8 +80,7 @@
                 </LinearLayout>
 
 
-                <!-- User's name and height -->
-                <!-- User's name and height -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -119,7 +113,7 @@
                         android:textSize="18sp" />
                 </LinearLayout>
 
-                <!-- User's age and weight -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -154,7 +148,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- RecyclerView for dynamic content -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/homeRecyclerView"
         android:layout_width="match_parent"
@@ -162,7 +156,7 @@
         android:layout_below="@id/topLayout"
         android:layout_above="@id/bottomMenu"/>
 
-    <!-- Bottom Navigation Bar -->
+
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"

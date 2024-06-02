@@ -44,6 +44,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
+import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.util.UUID
 
@@ -61,7 +63,7 @@ class PostUploadActivity : AppCompatActivity() {
     private var filteredMedicines = mutableListOf<String>()
     private var searchJob: Job? = null
     private var searchHandler = Handler(Looper.getMainLooper())
-    private val debouncePeriod: Long = 1  // Milisaniye cinsinden gecikme süresi
+    private val debouncePeriod: Long = 1
     private var medicinesSet = mutableSetOf<String>()
     private val trie = Trie()
 
@@ -80,12 +82,15 @@ class PostUploadActivity : AppCompatActivity() {
         firestore = Firebase.firestore
         storage = Firebase.storage
 
+
         cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
-                // Use the imageBitmap as needed
-                // For example, you can set it to an ImageView
                 binding.imageView.setImageBitmap(imageBitmap)
+
+                // Save the bitmap to a file and get a URI
+                val savedImageUri = saveBitmapToCache(imageBitmap)
+                selectedPicture = savedImageUri
             }
         }
 
@@ -139,6 +144,21 @@ class PostUploadActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveBitmapToCache(bitmap: Bitmap): Uri {
+        // Create a file in the cache directory
+        val file = File(externalCacheDir, "${UUID.randomUUID()}.jpg")
+        val fileOutputStream = FileOutputStream(file)
+
+        // Compress the bitmap and write it to the file
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+
+        // Close the output stream
+        fileOutputStream.close()
+
+        // Return a URI for the file
+        return Uri.fromFile(file)
+    }
+
     fun deletePhoto(view: View) {
         binding.imageView.setImageResource(R.drawable.select_image)
     }
@@ -160,7 +180,7 @@ class PostUploadActivity : AppCompatActivity() {
     private fun filterMedicines(query: String) {
         searchJob?.cancel()
         searchJob = CoroutineScope(Dispatchers.Default).launch {
-            delay(300)  // Wait for 300ms before starting the search
+            delay(300)
             val results = trie.wordsWithPrefix(query.lowercase())
             withContext(Dispatchers.Main) {
                 updateUI(results)
@@ -176,7 +196,7 @@ class PostUploadActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.setMargins(8, 8, 8, 8) }
-                text = medicine.uppercase()  // Convert the medicine name to uppercase
+                text = medicine.uppercase()
                 background = ContextCompat.getDrawable(context, R.drawable.fragment_background)
                 setPadding(16, 16, 16, 16)
                 gravity = Gravity.CENTER
@@ -195,7 +215,6 @@ class PostUploadActivity : AppCompatActivity() {
         val imageReference = reference.child("images").child(imageName)
 
         if (selectedPicture != null) {
-            // Upload the selected picture
             imageReference.putFile(selectedPicture!!).addOnSuccessListener { taskSnapshot ->
                 taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
                     val downloadUrl = uri.toString()
@@ -241,6 +260,7 @@ class PostUploadActivity : AppCompatActivity() {
                 val postId = documentReference.id
                 documentReference.update("postId", postId)
                 navigateToMedicineFeedActivity()
+                Toast.makeText(this, "You will be navigated to Feed Screen", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
                 Log.e("PostUploadActivity", "Failed to add document: ${e.localizedMessage}")
                 Toast.makeText(this, "Error saving post: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -288,7 +308,7 @@ class PostUploadActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK){
                 val intentFromResult = result.data
                 if (intentFromResult != null) {
-                    selectedPicture = intentFromResult.data // fotonunun URI'ı(nerede tutulduğu)
+                    selectedPicture = intentFromResult.data
 
                     selectedPicture?.let {
                         binding.imageView.setImageURI(it)
@@ -300,11 +320,11 @@ class PostUploadActivity : AppCompatActivity() {
 
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){result ->
             if (result){
-                //permission granted
+
                 val intentToGallery = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 activityResultLauncher.launch(intentToGallery)
 
-            }else{//permission denied
+            }else{
                 Toast.makeText(this@PostUploadActivity,"Permission needed!",Toast.LENGTH_LONG).show()
 
             }
