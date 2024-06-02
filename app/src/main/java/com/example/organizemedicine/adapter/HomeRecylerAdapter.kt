@@ -13,6 +13,7 @@ import com.example.organizemedicine.databinding.RecyclerRowBinding
 import com.example.organizemedicine.model.Post
 import com.example.organizemedicine.view.HomeActivity
 import com.example.organizemedicine.view.MedicineInfoActivity
+import com.example.organizemedicine.view.OnCommentButtonClickListener
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -51,18 +52,34 @@ class HomeRecyclerAdapter(
 
     class PostHolder(private val binding: RecyclerRowBinding, private val adapter: HomeRecyclerAdapter,private val postArrayList: ArrayList<Post>,private val firestoreDb: FirebaseFirestore = Firebase.firestore) : RecyclerView.ViewHolder(binding.root) {
         private val auth = Firebase.auth
-        fun bind(post: Post, shareListener: HomeActivity, commentListener: HomeActivity) {
-            binding.recyclerEmailText.text ="@" + post.username
+        fun bind(post: Post, listener: OnShareButtonClickListener, commentListener: OnCommentButtonClickListener) {
+            binding.recyclerEmailText.text = "@" + post.username
             binding.recyclerCommentText.text = post.comment
+            // Check if the current user has liked the post
+            post.isLiked = post.likedBy.contains(auth.currentUser?.uid)
+            binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
             binding.commentNum.text = post.commentsCount.toString()
             binding.fullnameTextView.text = post.fullname
 
-            post.isLiked = post.likedBy.contains(auth.currentUser?.uid)
-            binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
-
-
             binding.commentImageView.tag = post.postId
+
+            // Set up image every time bind is called
+            if (post.downloadUrl.isNullOrEmpty()) {
+                binding.recyclerImageView.visibility = View.GONE
+            } else {
+                binding.recyclerImageView.visibility = View.VISIBLE
+                Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
+                    override fun onSuccess() {
+                        // Image loaded successfully
+                    }
+
+                    override fun onError(e: Exception?) {
+                        binding.recyclerImageView.setImageResource(R.drawable.no_image)
+                        Toast.makeText(binding.root.context, "Failed to load image", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
 
             binding.likeImageView.setOnClickListener {
                 likePost(post)
@@ -72,9 +89,9 @@ class HomeRecyclerAdapter(
                 commentListener.onCommentButtonClick(it)
             }
 
-            setupShareButton(post, shareListener)
-
-
+            binding.shareImageView.setOnClickListener {
+                listener.onShareButtonClick(binding.root)
+            }
         }
 
         init {
@@ -164,15 +181,23 @@ class HomeRecyclerAdapter(
                 }
 
                 transaction.update(postRef, "likedBy", likedBy)
-                post.isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
-                post.likeCount = likedBy.size
+
+                // Find the post in the postList and update it
+                val index = postArrayList.indexOfFirst { it.postId == post.postId }
+                if (index != -1) {
+                    postArrayList[index].isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
+                    postArrayList[index].likeCount = likedBy.size
+                }
 
                 null
             }.addOnSuccessListener {
-                binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
-                binding.likeNum.text = post.likeCount.toString()
+                // Notify the adapter that the item has changed
+                val index = postArrayList.indexOfFirst { it.postId == post.postId }
+                if (index != -1) {
+                    adapter.notifyItemChanged(index)
+                }
             }.addOnFailureListener { e ->
-                Log.e("HomeRecyclerAdapter", "Error updating likes", e)
+                Log.e("FeedRecyclerAdapter", "Error updating likes", e)
             }
         }
 
