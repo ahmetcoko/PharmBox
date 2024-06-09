@@ -29,6 +29,8 @@ https://github.com/ahmetcoko/PharmBox/assets/158578355/3b109f45-2fd4-4e15-9dc2-f
 
 # Future Enhancements
 
-Redesigning the User Interface: We plan to overhaul the general design of PharmBox to provide a more intuitive and user-friendly experience. The new design will focus on ease of navigation and accessibility, ensuring that all users can efficiently manage their health information.
+# DONE
+Redesigning the User Interface: We plan to overhaul the general design of PharmBox to provide a more intuitive and user-friendly experience. The new design will focus on ease of navigation and accessibility, ensuring that all users can efficiently manage their health information. 
 
+# DONE
 Individual Drug Windows: To enhance information accessibility and organization, we will implement dedicated windows for each medication. This feature will allow users to view detailed information, reviews, and posts specific to a drug in a single, centralized location, making it easier to access and digest important data.
