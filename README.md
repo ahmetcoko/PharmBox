@@ -21,19 +21,11 @@ Firebase: Utilized for backend operations including user authentication, data st
 
 # Current Design 
 
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/69e5dfa1-bbb9-485d-8659-33a05098f1e9)
 
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/1b16a841-d9b5-420b-9366-a27a05deafe1)
 
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/3f0efbd9-acb5-4f5c-b36b-5d25b188d6bd)
+https://github.com/ahmetcoko/PharmBox/assets/158578355/3b109f45-2fd4-4e15-9dc2-f0d2c41abd37
 
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/c45615ac-a8c2-428f-97b1-c5ed47b26828)
 
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/0d962cf2-4cd0-4f1a-b0ce-c84093209118)
-
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/588b5e35-17d2-4033-9ec2-c4df6bd5b3f6)
-
-![image](https://github.com/ahmetcoko/PharmBox/assets/158578355/3e5c1bcc-0407-4c09-aa8c-9e915716c337)
 
 # Future Enhancements
 
