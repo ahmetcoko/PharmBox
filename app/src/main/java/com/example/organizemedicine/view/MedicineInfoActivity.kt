@@ -111,7 +111,7 @@ class MedicineInfoActivity : AppCompatActivity(), OnShareButtonClickListener {
                     .addOnSuccessListener { document ->
                         val username = document.getString("username")
                         if (username != null) {
-                            // Add the comment to Firestore
+                            
                             val newComment = hashMapOf(
                                 "username" to username,
                                 "content" to comment
