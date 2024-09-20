@@ -110,7 +110,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                         binding.userHeightTextView.setText(String.format("%.2f", heightCm))
                         binding.userWeightTextView.setText(String.format("%.2f", weight))
 
-                        // Calculate and display the BMI value
+                        
                         if (heightCm > 0) {
                             val heightM = heightCm / 100
                             val bmi = weight / (heightM * heightM)
@@ -263,13 +263,13 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
         btnAddComment.setOnClickListener {
             val comment = editTextComment.text.toString()
             if (comment.isNotBlank()) {
-                // Retrieve the username from Firestore
+               
                 firestoreDb.collection("Users").document(auth.currentUser?.uid!!)
                     .get()
                     .addOnSuccessListener { document ->
                         val username = document.getString("username")
                         if (username != null) {
-                            // Add the comment to Firestore
+                            
                             val newComment = hashMapOf(
                                 "username" to username,
                                 "content" to comment
@@ -277,25 +277,25 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
                             firestoreDb.collection("Posts").document(postId)
                                 .update("comments", FieldValue.arrayUnion(newComment))
 
-                            // Increment the commentsCount of the post
+                           
                             firestoreDb.collection("Posts").document(postId).get().addOnSuccessListener { document ->
                                 if (document != null) {
                                     val commentsCount = document.getLong("commentsCount")?.toInt() ?: 0
                                     val updatedCommentsCount = commentsCount + 1
 
-                                    // Update the post in the Posts collection in Firestore
+                                    
                                     firestoreDb.collection("Posts").document(postId).update("commentsCount", updatedCommentsCount)
                                 }
                             }
 
                             dialog.dismiss()
                         } else {
-                            // Handle the case where the username is null
+                            
                             Toast.makeText(this, "Failed to retrieve username", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { e ->
-                        // Handle the error
+                      
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
@@ -363,7 +363,7 @@ class HomeActivity : AppCompatActivity(), OnShareButtonClickListener, OnCommentB
 
                 val fileUri = FileProvider.getUriForFile(this@HomeActivity, "$packageName.provider", file)
 
-                // Create the share intent
+                
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_STREAM, fileUri)
