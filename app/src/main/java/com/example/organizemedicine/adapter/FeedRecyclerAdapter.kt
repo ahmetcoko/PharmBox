@@ -58,14 +58,14 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
             binding.commentImageView.tag = post.postId
 
-            // Set up image every time bind is called
+            
             if (post.downloadUrl.isNullOrEmpty()) {
                 binding.recyclerImageView.visibility = View.GONE
             } else {
                 binding.recyclerImageView.visibility = View.VISIBLE
                 Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {
-                        // Image loaded successfully
+                       
                     }
 
                     override fun onError(e: Exception?) {
@@ -160,7 +160,7 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
                     }
 
                     override fun onError(e: Exception?) {
-                        // Handle errors, e.g., show a placeholder image or a message
+                        
                         binding.recyclerImageView.setImageResource(R.drawable.no_image)
                         Toast.makeText(binding.root.context, "Failed to load image", Toast.LENGTH_SHORT).show()
                     }
@@ -182,7 +182,7 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
                 transaction.update(postRef, "likedBy", likedBy)
 
-                // Find the post in the postList and update it
+                
                 val index = postArrayList.indexOfFirst { it.postId == post.postId }
                 if (index != -1) {
                     postArrayList[index].isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
@@ -191,7 +191,7 @@ class FeedRecyclerAdapter(private val postList: ArrayList<Post>, private val lis
 
                 null
             }.addOnSuccessListener {
-                // Notify the adapter that the item has changed
+                
                 val index = postArrayList.indexOfFirst { it.postId == post.postId }
                 if (index != -1) {
                     adapter.notifyItemChanged(index)
