@@ -199,7 +199,7 @@ class PharmaciesActivity : AppCompatActivity(), OnMapReadyCallback {
                 runOnUiThread {
                     if (responseData != null) {
                         Toast.makeText(applicationContext, "Pharmacies fetched successfully!", Toast.LENGTH_LONG).show()
-                        addPharmacyMarkers(responseData)  // Call to place markers
+                        addPharmacyMarkers(responseData)  
 
                         val jsonObj = JSONObject(responseData)
                         val pharmaciesArray = jsonObj.getJSONArray("result")
