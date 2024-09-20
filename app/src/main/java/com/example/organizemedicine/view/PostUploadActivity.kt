@@ -88,7 +88,7 @@ class PostUploadActivity : AppCompatActivity() {
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
                 binding.imageView.setImageBitmap(imageBitmap)
 
-                // Save the bitmap to a file and get a URI
+                
                 val savedImageUri = saveBitmapToCache(imageBitmap)
                 selectedPicture = savedImageUri
             }
@@ -145,17 +145,17 @@ class PostUploadActivity : AppCompatActivity() {
     }
 
     private fun saveBitmapToCache(bitmap: Bitmap): Uri {
-        // Create a file in the cache directory
+        
         val file = File(externalCacheDir, "${UUID.randomUUID()}.jpg")
         val fileOutputStream = FileOutputStream(file)
 
-        // Compress the bitmap and write it to the file
+        
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
 
-        // Close the output stream
+        
         fileOutputStream.close()
 
-        // Return a URI for the file
+        
         return Uri.fromFile(file)
     }
 
@@ -228,7 +228,7 @@ class PostUploadActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error uploading image: ${it.message}", Toast.LENGTH_SHORT).show()
             }
         } else {
-            // If no picture is selected, use a null URL for the post
+            
             savePostToFirestore(null)
         }
     }
@@ -285,17 +285,17 @@ class PostUploadActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE)){
                 Snackbar.make(view,"Permission denied for gallery" , Snackbar.LENGTH_INDEFINITE).setAction("Give Permission"){
-                    //request permission
+                    
                     permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                 }.show()
             }else{
-                //request permission
+               
                 permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
 
         }else{
             val intentToGallery = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            //start activity fo result
+            
             activityResultLauncher.launch(intentToGallery)
 
 
