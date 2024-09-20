@@ -55,7 +55,7 @@ class HomeRecyclerAdapter(
         fun bind(post: Post, listener: OnShareButtonClickListener, commentListener: OnCommentButtonClickListener) {
             binding.recyclerEmailText.text = "@" + post.username
             binding.recyclerCommentText.text = post.comment
-            // Check if the current user has liked the post
+            
             post.isLiked = post.likedBy.contains(auth.currentUser?.uid)
             binding.likeImageView.setImageResource(if (post.isLiked) R.drawable.liked else R.drawable.unliked)
             binding.likeNum.text = post.likeCount.toString()
@@ -64,14 +64,14 @@ class HomeRecyclerAdapter(
 
             binding.commentImageView.tag = post.postId
 
-            // Set up image every time bind is called
+            
             if (post.downloadUrl.isNullOrEmpty()) {
                 binding.recyclerImageView.visibility = View.GONE
             } else {
                 binding.recyclerImageView.visibility = View.VISIBLE
                 Picasso.get().load(post.downloadUrl).into(binding.recyclerImageView, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {
-                        // Image loaded successfully
+                       
                     }
 
                     override fun onError(e: Exception?) {
@@ -182,7 +182,7 @@ class HomeRecyclerAdapter(
 
                 transaction.update(postRef, "likedBy", likedBy)
 
-                // Find the post in the postList and update it
+                
                 val index = postArrayList.indexOfFirst { it.postId == post.postId }
                 if (index != -1) {
                     postArrayList[index].isLiked = likedBy.contains(adapter.auth.currentUser?.uid)
@@ -191,7 +191,7 @@ class HomeRecyclerAdapter(
 
                 null
             }.addOnSuccessListener {
-                // Notify the adapter that the item has changed
+                
                 val index = postArrayList.indexOfFirst { it.postId == post.postId }
                 if (index != -1) {
                     adapter.notifyItemChanged(index)
